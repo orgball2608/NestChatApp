@@ -13,7 +13,7 @@ export class User {
   firstName: string;
 
   @Column()
-  lastname: string;
+  lastName: string;
 
   @Column()
   @Exclude()
