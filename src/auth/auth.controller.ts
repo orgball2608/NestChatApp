@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, UseGuards } from "@nestjs/common";
 import { Routes, Services } from '../utils/constants';
 import { IAuthService } from './auth';
 import { CreateUserDto } from './dtos/CreateUser.dto';
@@ -21,7 +21,9 @@ export class AuthController {
   }
   @Post('login')
   @UseGuards(LocalAuthGuard)
-  login() {}
+  login() {
+    console.log('login');
+  }
 
   @Get('status')
   status() {}
