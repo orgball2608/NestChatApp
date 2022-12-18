@@ -9,10 +9,11 @@ import * as passport from 'passport';
 import { getRepository } from 'typeorm';
 
 async function bootstrap() {
-  const PORT = process.env.PORT || 5500;
+  const PORT = process.env.PORT || 3001;
   const app = await NestFactory.create(AppModule);
   const sessionRepository = getRepository(Session);
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors({ origin: ['http://localhost:3000'], credentials: true });
   app.setGlobalPrefix('api');
   app.use(
     session({
