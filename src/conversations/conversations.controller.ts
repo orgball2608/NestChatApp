@@ -1,4 +1,4 @@
-import {Body, Controller, Inject, Post, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Inject, Param, Post, UseGuards} from '@nestjs/common';
 import {Routes, Services} from "../utils/constants";
 import {IConversationsService} from "./conversations";
 import {AuthenticatedGuard} from "../auth/utils/Guards";
@@ -21,4 +21,19 @@ export class ConversationsController {
             createConversationPayload,
         );
     }
+
+    @Get()
+    async getConversations(@AuthUser() user: User) {
+        const { id } = user.participant;
+        return await this.conversationsService.find(id);
+    }
+
+    @Get(':id')
+    async getConversationById(@Param('id') id: number) {
+        return await this.conversationsService.findConversationById(
+            id,
+        );
+    }
+
+
 }

@@ -33,7 +33,7 @@ export class UserService implements IUserService {
     });
   }
 
-  async saveUser(user: User){
+  async saveUser(user: User) {
     return this.userRepository.save(user);
   }
 }
