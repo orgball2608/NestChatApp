@@ -1,16 +1,19 @@
-import {Body, Controller, Get, Inject, Param, Post, UseGuards} from '@nestjs/common';
-import {Routes, Services} from "../utils/constants";
-import {IConversationsService} from "./conversations";
-import {AuthenticatedGuard} from "../auth/utils/Guards";
-import {CreateConversationDto} from "./dtos/CreateConversation.dto";
-import {AuthUser} from "../utils/decorator";
-import {User} from "../utils/typeorm";
+import {Body, Controller, Get, Inject, Param, Post, UseGuards,} from '@nestjs/common';
+import {AuthenticatedGuard} from '../auth/utils/Guards';
+import {Routes, Services} from '../utils/constants';
+import {AuthUser} from '../utils/decorator';
+import {User} from '../utils/typeorm';
+import {IConversationsService} from './conversations';
+import {CreateConversationDto} from './dtos/CreateConversation.dto';
 
 @Controller(Routes.CONVERSATIONS)
 @UseGuards(AuthenticatedGuard)
 export class ConversationsController {
-    constructor(@Inject(Services.CONVERSATIONS) private readonly  conversationsService:IConversationsService) {
-    }
+    constructor(
+        @Inject(Services.CONVERSATIONS)
+        private readonly conversationsService: IConversationsService,
+    ) {}
+
     @Post()
     async createConversation(
         @AuthUser() user: User,
@@ -23,9 +26,8 @@ export class ConversationsController {
     }
 
     @Get()
-    async getConversations(@AuthUser() user: User) {
-        const { id } = user.participant;
-        return await this.conversationsService.find(id);
+    async getConversations(@AuthUser() { id }: User) {
+        return this.conversationsService.getConversations(id);
     }
 
     @Get(':id')
@@ -34,6 +36,4 @@ export class ConversationsController {
             id,
         );
     }
-
-
 }

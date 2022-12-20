@@ -1,21 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ConversationsService } from './conversations.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from '../users/users.module';
+import { Services } from '../utils/constants';
+import { Conversation } from '../utils/typeorm';
 import { ConversationsController } from './conversations.controller';
-import { Services } from 'src/utils/constants';
-import {TypeOrmModule} from "@nestjs/typeorm";
-import {Conversation, Participant, User} from "../utils/typeorm";
-import {ParticipantsModule} from "../participants/participants.module";
-import {UsersModule} from "../users/users.module";
+import { ConversationsService } from './conversations.service';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Conversation,Participant]),
-    ParticipantsModule,
-    UsersModule,
+  imports: [TypeOrmModule.forFeature([Conversation]), UsersModule],
+  controllers: [ConversationsController],
+  providers: [
+    {
+      provide: Services.CONVERSATIONS,
+      useClass: ConversationsService,
+    },
   ],
-  providers: [{
-    provide: Services.CONVERSATIONS,
-    useClass: ConversationsService,
-  }],
-  controllers: [ConversationsController]
 })
 export class ConversationsModule {}
