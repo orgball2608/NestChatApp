@@ -5,6 +5,7 @@ import {Repository} from "typeorm";
 import {CreateMessageParams} from "../utils/types";
 import {IMessageService} from "./messages";
 import {instanceToPlain} from "class-transformer";
+
 @Injectable()
 export class MessagesService implements IMessageService{
     constructor(@InjectRepository(Message) private readonly messageRepository: Repository<Message>, @InjectRepository(Conversation) private readonly conversationRepository :Repository<Conversation>,
@@ -32,9 +33,17 @@ export class MessagesService implements IMessageService{
             conversation,
             author: instanceToPlain(user),
         });
-        return this.messageRepository.save(newMessage);
+
+        conversation.lastMessageSent = await this.messageRepository.save(newMessage);
+        await this.conversationRepository.save(conversation);
+        return;
     }
 
-
-
+    getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+        return this.messageRepository.find({
+            relations: ['author'],
+            where: { conversation: { id: conversationId } },
+            order: { createdAt: 'DESC' },
+        });
+    }
 }
