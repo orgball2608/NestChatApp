@@ -1,6 +1,12 @@
 import { Exclude } from 'class-transformer';
-import {Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {Message} from "./Message";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Message } from './Message';
 
 @Entity({ name: 'users' })
 export class User {

@@ -1,14 +1,20 @@
-import {User} from "./User";
-import {Conversation} from "./Conversation";
-import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Conversation } from './Conversation';
+import { User } from './User';
 
-@Entity({name:'messages'})
+@Entity({ name: 'messages' })
 export class Message {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column('text')
-    content:string;
+    content: string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: number;
@@ -16,6 +22,6 @@ export class Message {
     @ManyToOne(() => User, (user) => user.messages)
     author: User;
 
-    @ManyToOne(()=> Conversation, (conversation)=>conversation.messages)
+    @ManyToOne(() => Conversation, (conversation) => conversation.messages)
     conversation: Conversation;
 }
