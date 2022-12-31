@@ -11,17 +11,16 @@ import { OnEvent } from '@nestjs/event-emitter';
 @WebSocketGateway({
     cors: {
         origin: ['http://localhost:3000'],
+        credentials: true,
     },
 })
 export class MessagingGateway implements OnGatewayConnection {
-    handleConnection(client: Socket, ...args: any[]) {
-        console.log('New Incoming Connection');
-        console.log(client.id);
-        client.emit('connected', { status: 'good' });
-    }
-
     @WebSocketServer()
     server: Server;
+    handleConnection(client: Socket, ...args: any[]) {
+        console.log('New Incoming Connection');
+        client.emit('connected', { status: 'good' });
+    }
 
     @SubscribeMessage('createMessage')
     handleCreateMessage(@MessageBody() data: any) {
@@ -31,7 +30,6 @@ export class MessagingGateway implements OnGatewayConnection {
     @OnEvent('message.create')
     handleMessageCreateEvent(payload: any) {
         console.log('Inside message.create');
-        console.log(payload);
         this.server.emit('onMessage', payload);
     }
 }
