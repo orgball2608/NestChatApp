@@ -24,8 +24,7 @@ export class WebsocketAdapter extends IoAdapter {
             const signedCookie = cookieParser.signedCookie(CHAT_APP_SESSION_ID, process.env.COOKIE_SECRET);
             if (!signedCookie) return next(new Error('Error signing cookie'));
             const sessionDB = await sessionRepository.findOne({ id: signedCookie });
-            const userDB = plainToInstance(User, JSON.parse(sessionDB.json).passport.user);
-            socket.user = userDB;
+            socket.user = plainToInstance(User, JSON.parse(sessionDB.json).passport.user);
             next();
         });
         return server;
