@@ -14,11 +14,11 @@ export class MessagesController {
     ) {}
     @Post()
     async createMessage(@AuthUser() user: User, @Body() createMessageDto: CreateMessageDto) {
-        const msg = await this.messageService.createMessage({
+        const response = await this.messageService.createMessage({
             ...createMessageDto,
             user,
         });
-        this.eventEmitter.emit('message.create', msg);
+        this.eventEmitter.emit('message.create', response);
         return;
     }
 

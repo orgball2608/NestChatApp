@@ -26,7 +26,7 @@ export class ConversationsService implements IConversationsService {
             .addSelect(['recipient.id', 'recipient.firstName', 'recipient.lastName', 'recipient.email'])
             .where('creator.id = :id', { id })
             .orWhere('recipient.id = :id', { id })
-            .orderBy('conversation.id', 'DESC')
+            .orderBy('conversation.lastMessageSentAt', 'DESC')
             .getMany();
     }
 
