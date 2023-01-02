@@ -6,12 +6,14 @@ import {
     SubscribeMessage,
     MessageBody,
     OnGatewayConnection,
+    ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
 import { CreateMessageResponse } from '../utils/types';
+import { Conversation } from '../utils/typeorm';
 
 @WebSocketGateway({
     cors: {
@@ -34,6 +36,13 @@ export class MessagingGateway implements OnGatewayConnection {
     @WebSocketServer()
     server: Server;
 
+    @SubscribeMessage('onClientConnect')
+    onClientConnect(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+        console.log('onClientConnect');
+        console.log(data);
+        console.log(client.user);
+    }
+
     @SubscribeMessage('createMessage')
     handleCreateMessage(@MessageBody() data: any) {
         console.log('Create Message');
@@ -55,5 +64,11 @@ export class MessagingGateway implements OnGatewayConnection {
 
         if (authorSocket) authorSocket.emit('onMessage', payload);
         if (recipientSocket) recipientSocket.emit('onMessage', payload);
+    }
+    @OnEvent('conversation.create')
+    handleConversationCreateEvent(payload: Conversation) {
+        console.log('Inside conversation.create');
+        const recipientSocket = this.sessions.getUserSocket(payload.recipient.id);
+        if (recipientSocket) recipientSocket.emit('onConversation', payload);
     }
 }
