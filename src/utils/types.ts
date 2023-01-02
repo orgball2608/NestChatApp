@@ -18,23 +18,13 @@ export type FindUserParams = Partial<{
 }>;
 
 export type CreateConversationParams = {
-    recipientId: number;
+    email: string;
     message: string;
 };
-
-export type ConversationIdentityType = 'author' | 'recipient';
-
-export type FindParticipantParams = Partial<{
-    id: number;
-}>;
 
 export interface AuthenticatedRequest extends Request {
     user: User;
 }
-
-export type CreateParticipantParams = {
-    id: number;
-};
 
 export type CreateMessageParams = {
     content: string;
