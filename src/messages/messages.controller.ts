@@ -13,21 +13,20 @@ export class MessagesController {
         private eventEmitter: EventEmitter2,
     ) {}
     @Post()
-    async createMessage(@AuthUser() user: User, @Body() createMessageDto: CreateMessageDto) {
-        const response = await this.messageService.createMessage({
-            ...createMessageDto,
-            user,
-        });
+    async createMessage(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) conversationId: number,
+        @Body() { content }: CreateMessageDto,
+    ) {
+        const params = { user, conversationId, content };
+        const response = await this.messageService.createMessage(params);
         this.eventEmitter.emit('message.create', response);
         return;
     }
 
-    @Get(':conversationId')
-    async getMessagesFromConversation(
-        @AuthUser() user: User,
-        @Param('conversationId', ParseIntPipe) conversationId: number,
-    ) {
-        const messages = await this.messageService.getMessagesByConversationId(conversationId);
-        return { id: conversationId, messages };
+    @Get()
+    async getMessagesFromConversation(@AuthUser() user: User, @Param('id', ParseIntPipe) id: number) {
+        const messages = await this.messageService.getMessagesByConversationId(id);
+        return { id: id, messages };
     }
 }
