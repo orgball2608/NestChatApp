@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { Conversation, Message } from '../utils/typeorm';
-import { CreateMessageParams } from '../utils/types';
+import { CreateMessageParams, DeleteMessageParams } from '../utils/types';
 import { IMessageService } from './messages';
 @Injectable()
 export class MessagesService implements IMessageService {
@@ -43,5 +43,61 @@ export class MessagesService implements IMessageService {
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
         });
+    }
+
+    async deleteMessage(params: DeleteMessageParams) {
+        const conversation = await this.conversationRepository
+            .createQueryBuilder('conversation')
+            .where('id = :conversationId', { conversationId: params.conversationId })
+            .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
+            .leftJoinAndSelect('conversation.messages', 'message')
+            .where('conversation.id = message.conversationId')
+            .orderBy('message.createdAt', 'DESC')
+            .limit(5)
+            .getOne();
+
+        console.log(conversation);
+
+        if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
+
+        const message = await this.messageRepository.findOne({
+            id: params.messageId,
+            author: { id: params.userId },
+            conversation: {
+                id: params.conversationId,
+            },
+        });
+        console.log('message', message);
+
+        if (!message) throw new HttpException('Cannot delete message', HttpStatus.BAD_REQUEST);
+
+        if (conversation.lastMessageSent.id !== message.id) return this.messageRepository.delete({ id: message.id });
+
+        const size = conversation.messages.length;
+        const SECOND_MESSAGE_INDEX = 1;
+        if (size <= 1) {
+            console.log('Last Message Sent is deleted');
+            await this.conversationRepository.update(
+                {
+                    id: params.conversationId,
+                },
+                {
+                    lastMessageSent: null,
+                },
+            );
+            await this.messageRepository.delete({ id: params.messageId });
+        } else {
+            console.log('There are more than 1 message');
+            const newLastMessage = conversation.messages[SECOND_MESSAGE_INDEX];
+            await this.conversationRepository.update(
+                {
+                    id: params.conversationId,
+                },
+                {
+                    lastMessageSent: newLastMessage,
+                },
+            );
+            await this.messageRepository.delete({ id: params.messageId });
+        }
     }
 }

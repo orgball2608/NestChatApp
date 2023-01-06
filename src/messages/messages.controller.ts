@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { Routes, Services } from '../utils/constants';
 import { IMessageService } from './messages';
 import { AuthUser } from '../utils/decorator';
@@ -28,5 +28,18 @@ export class MessagesController {
     async getMessagesFromConversation(@AuthUser() user: User, @Param('id', ParseIntPipe) id: number) {
         const messages = await this.messageService.getMessagesByConversationId(id);
         return { id: id, messages };
+    }
+
+    @Delete(':messageId')
+    async deleteMessageFromConversation(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) conversationId: number,
+        @Param('messageId', ParseIntPipe) messageId: number,
+    ) {
+        await this.messageService.deleteMessage({
+            userId: user.id,
+            conversationId,
+            messageId,
+        });
     }
 }
