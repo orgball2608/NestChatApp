@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 import { Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
-import { CreateMessageResponse } from '../utils/types';
+import { CreateMessageResponse, DeleteMessageParams } from '../utils/types';
 import { Conversation } from '../utils/typeorm';
 
 @WebSocketGateway({
@@ -25,6 +25,8 @@ export class MessagingGateway implements OnGatewayConnection {
     constructor(
         @Inject(Services.GATEWAY_SESSION_MANAGER)
         private readonly sessions: IGatewaySessionManager,
+        @Inject(Services.CONVERSATIONS)
+        private readonly conversationService,
     ) {}
 
     handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
@@ -70,5 +72,19 @@ export class MessagingGateway implements OnGatewayConnection {
         console.log('Inside conversation.create');
         const recipientSocket = this.sessions.getUserSocket(payload.recipient.id);
         if (recipientSocket) recipientSocket.emit('onConversation', payload);
+    }
+
+    @OnEvent('message.delete')
+    async handleMessageDeleteEvent(payload: DeleteMessageParams) {
+        console.log('Inside message.delete');
+        const { conversationId } = payload;
+        const conversation = await this.conversationService.findConversationById({ conversationId });
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket =
+            creator.id === payload.userId
+                ? this.sessions.getUserSocket(recipient.id)
+                : this.sessions.getUserSocket(creator.id);
+        if (recipientSocket) recipientSocket.emit('onMessageDelete', payload);
     }
 }
