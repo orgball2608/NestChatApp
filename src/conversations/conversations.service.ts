@@ -35,7 +35,7 @@ export class ConversationsService implements IConversationsService {
             where: {
                 id,
             },
-            relations: ['lastMessageSent'],
+            relations: ['lastMessageSent', 'creator', 'recipient'],
         });
     }
 

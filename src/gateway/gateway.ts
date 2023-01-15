@@ -30,19 +30,44 @@ export class MessagingGateway implements OnGatewayConnection {
     ) {}
 
     handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
-        console.log('New Incoming Connection');
-        console.log(socket.user);
         this.sessions.setUserSocket(socket.user.id, socket);
-        socket.emit('connected', { status: 'good' });
+        socket.emit('connected');
     }
     @WebSocketServer()
     server: Server;
 
-    @SubscribeMessage('onClientConnect')
-    onClientConnect(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
-        console.log('onClientConnect');
-        console.log(data);
-        console.log(client.user);
+    @SubscribeMessage('onConversationJoin')
+    onConversationJoin(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+        client.to(data.conversationId).emit('userJoin');
+    }
+
+    @SubscribeMessage('onConversationLeave')
+    onConversationLeave(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+        client.to(data.conversationId).emit('userJoin');
+    }
+
+    @SubscribeMessage('onTypingStart')
+    async onTypingStart(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+        const conversation = await this.conversationService.findConversationById(data.conversationId);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket =
+            creator.id === data.userId
+                ? this.sessions.getUserSocket(recipient.id)
+                : this.sessions.getUserSocket(creator.id);
+        if (recipientSocket) recipientSocket.emit('onTypingStart');
+    }
+
+    @SubscribeMessage('onTypingStop')
+    async onTypingStop(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+        const conversation = await this.conversationService.findConversationById(data.conversationId);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket =
+            creator.id === data.userId
+                ? this.sessions.getUserSocket(recipient.id)
+                : this.sessions.getUserSocket(creator.id);
+        if (recipientSocket) recipientSocket.emit('onTypingStop');
     }
 
     @SubscribeMessage('createMessage')
