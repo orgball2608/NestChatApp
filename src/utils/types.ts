@@ -42,3 +42,10 @@ export type DeleteMessageParams = {
     conversationId: number;
     messageId: number;
 };
+
+export type EditMessageParams = {
+    userId: number;
+    conversationId: number;
+    messageId: number;
+    content: string;
+};

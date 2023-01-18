@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { Conversation, Message } from '../utils/typeorm';
-import { CreateMessageParams, DeleteMessageParams } from '../utils/types';
+import { CreateMessageParams, DeleteMessageParams, EditMessageParams } from '../utils/types';
 import { IMessageService } from './messages';
 @Injectable()
 export class MessagesService implements IMessageService {
@@ -99,5 +99,18 @@ export class MessagesService implements IMessageService {
             );
             return this.messageRepository.delete({ id: params.messageId });
         }
+    }
+
+    async editMessage(params: EditMessageParams) {
+        const message = await this.messageRepository.findOne({
+            id: params.messageId,
+            author: { id: params.userId },
+        });
+
+        console.log(message);
+
+        if (!message) throw new HttpException('Cannot Edit Message', HttpStatus.BAD_REQUEST);
+        message.content = params.content;
+        return this.messageRepository.save(message);
     }
 }
