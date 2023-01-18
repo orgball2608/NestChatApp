@@ -21,7 +21,6 @@ export class MessagesService implements IMessageService {
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
         const { creator, recipient } = conversation;
-        console.log(`User ID: ${user.id}`);
 
         if (creator.id !== user.id && recipient.id !== user.id)
             throw new HttpException('Cannot Create Message', HttpStatus.FORBIDDEN);
@@ -67,7 +66,6 @@ export class MessagesService implements IMessageService {
                 id: params.conversationId,
             },
         });
-        console.log('message', message);
 
         if (!message) throw new HttpException('Cannot delete message', HttpStatus.BAD_REQUEST);
 
@@ -103,12 +101,12 @@ export class MessagesService implements IMessageService {
 
     async editMessage(params: EditMessageParams) {
         const message = await this.messageRepository.findOne({
-            id: params.messageId,
-            author: { id: params.userId },
+            where: {
+                id: params.messageId,
+                author: { id: params.userId },
+            },
+            relations: ['conversation', 'conversation.creator', 'conversation.recipient', 'author'],
         });
-
-        console.log(message);
-
         if (!message) throw new HttpException('Cannot Edit Message', HttpStatus.BAD_REQUEST);
         message.content = params.content;
         return this.messageRepository.save(message);

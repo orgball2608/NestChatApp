@@ -112,4 +112,18 @@ export class MessagingGateway implements OnGatewayConnection {
                 : this.sessions.getUserSocket(creator.id);
         if (recipientSocket) recipientSocket.emit('onMessageDelete', payload);
     }
+
+    @OnEvent('message.edit')
+    async handleMessageEditEvent(payload) {
+        console.log('Inside message.edit');
+        const {
+            conversation: { creator, recipient },
+            author,
+        } = payload;
+        const recipientSocket =
+            creator.id === author.id
+                ? this.sessions.getUserSocket(recipient.id)
+                : this.sessions.getUserSocket(creator.id);
+        if (recipientSocket) recipientSocket.emit('onMessageUpdate', payload);
+    }
 }
