@@ -36,10 +36,13 @@ export class GroupsService implements IGroupService {
             where: {
                 id,
             },
-            relations: ['creator', 'users'],
+            relations: ['creator', 'users', 'lastMessageSent'],
         });
         if (!group) return;
         const checkUser = group.users.find((user) => user.id == userId);
         if (checkUser) return group;
+    }
+    saveGroup(group: Group) {
+        return this.groupRepository.save(group);
     }
 }

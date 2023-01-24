@@ -64,3 +64,9 @@ export type GetGroupsByIdParams = {
     id: number;
     userId: number;
 };
+
+export type CreateGroupMessageParams = {
+    groupId: number;
+    content: string;
+    author: User;
+};
