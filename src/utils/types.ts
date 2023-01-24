@@ -70,3 +70,7 @@ export type CreateGroupMessageParams = {
     content: string;
     author: User;
 };
+
+export type FindUserSelectOption = Partial<{
+    selectAll: boolean;
+}>;
