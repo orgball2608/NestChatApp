@@ -1,8 +1,9 @@
-import { Body, Controller, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { Routes, Services } from '../utils/constants';
 import { AuthUser } from '../utils/decorator';
 import { User } from '../utils/typeorm';
 import { CreateGroupMessageDto } from './dtos/CreateGroupMessage.dto';
+import { getGroupMessagesResponse } from '../utils/types';
 
 @Controller(Routes.GROUP_MESSAGES)
 export class GroupMessagesController {
@@ -18,5 +19,14 @@ export class GroupMessagesController {
             groupId,
             content,
         });
+    }
+
+    @Get()
+    async getGroupMessages(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) groupId: number,
+    ): Promise<getGroupMessagesResponse> {
+        const messages = await this.groupMessageService.getGroupMessages({ groupId, author: user });
+        return { groupId, messages };
     }
 }

@@ -1,4 +1,4 @@
-import { Conversation, Message, User } from './typeorm';
+import { Conversation, GroupMessage, Message, User } from './typeorm';
 
 export type CreateUserDetails = {
     email: string;
@@ -74,3 +74,13 @@ export type CreateGroupMessageParams = {
 export type FindUserSelectOption = Partial<{
     selectAll: boolean;
 }>;
+
+export type getGroupMessagesParams = {
+    groupId: number;
+    author: User;
+};
+
+export type getGroupMessagesResponse = {
+    groupId: number;
+    messages: GroupMessage[];
+};
