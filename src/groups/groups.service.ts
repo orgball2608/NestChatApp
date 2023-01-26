@@ -26,6 +26,7 @@ export class GroupsService implements IGroupService {
         return await this.groupRepository
             .createQueryBuilder('group')
             .leftJoinAndSelect('group.users', 'user')
+            .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
             .where('user.id = :userId', { userId: params.userId })
             .getMany();
     }

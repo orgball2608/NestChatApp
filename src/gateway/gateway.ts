@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 import { Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
-import { CreateMessageResponse, DeleteMessageParams } from '../utils/types';
+import { CreateGroupMessageResponse, CreateMessageResponse, DeleteMessageParams } from '../utils/types';
 import { Conversation } from '../utils/typeorm';
 
 @WebSocketGateway({
@@ -125,5 +125,25 @@ export class MessagingGateway implements OnGatewayConnection {
                 ? this.sessions.getUserSocket(recipient.id)
                 : this.sessions.getUserSocket(creator.id);
         if (recipientSocket) recipientSocket.emit('onMessageUpdate', payload);
+    }
+
+    @SubscribeMessage('onGroupJoin')
+    onGroupJoin(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+        console.log('onGroupJoin');
+        client.join(`group-${data.groupId}`);
+        client.to(`group-${data.groupId}`).emit('userGroupJoin');
+    }
+    @SubscribeMessage('onGroupLeave')
+    onGroupLeave(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+        console.log('onGroupJoin');
+        client.leave(`group-${data.groupId}`);
+        client.to(`group-${data.groupId}`).emit('userGroupLeave');
+    }
+
+    @OnEvent('group.message.create')
+    async handleGroupMessageCreateEvent(payload: CreateGroupMessageResponse) {
+        console.log('Inside group.message.create');
+        const { id } = payload.group;
+        this.server.to(`group-${id}`).emit('onGroupMessage', payload);
     }
 }

@@ -25,17 +25,19 @@ export class GroupMessagesService implements IGroupMessageService {
             group,
             content,
         });
-        group.lastMessageSent = await this.groupMessageRepository.save(groupMessage);
-        return this.groupService.saveGroup(group);
+        const savedMessage = await this.groupMessageRepository.save(groupMessage);
+        group.lastMessageSent = savedMessage;
+        const updatedGroup = await this.groupService.saveGroup(group);
+        return { message: savedMessage, group: updatedGroup };
     }
     async getGroupMessages(params: getGroupMessagesParams) {
-        const { author, groupId } = params;
-        const group = await this.groupService.getGroupById({ id: groupId, userId: author.id });
+        const { author, id } = params;
+        const group = await this.groupService.getGroupById({ id, userId: author.id });
         if (!group) throw new HttpException('No Group Found to Get GroupMessage', HttpStatus.BAD_REQUEST);
         const existUser = group.users.find((user) => user.id == author.id);
         if (!existUser) throw new HttpException('User not in Group !Cant get Messages', HttpStatus.BAD_REQUEST);
         return await this.groupMessageRepository.find({
-            where: { id: groupId },
+            where: { group: { id } },
             relations: ['author'],
             order: {
                 createdAt: 'DESC',
