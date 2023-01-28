@@ -13,7 +13,7 @@ import { Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
 import { CreateGroupMessageResponse, CreateMessageResponse, DeleteMessageParams } from '../utils/types';
-import { Conversation } from '../utils/typeorm';
+import { Conversation, GroupMessage } from '../utils/typeorm';
 
 @WebSocketGateway({
     cors: {
@@ -161,5 +161,12 @@ export class MessagingGateway implements OnGatewayConnection {
         console.log('Inside group.message.delete');
         const { groupId } = payload;
         this.server.to(`group-${groupId}`).emit('onGroupMessage', payload);
+    }
+
+    @OnEvent('group.message.update')
+    async handleGroupMessageUpdateEvent(payload: GroupMessage) {
+        console.log('Inside group.message.update');
+        const { id } = payload.group;
+        this.server.to(`group-${id}`).emit('onEditGroupMessage', payload);
     }
 }

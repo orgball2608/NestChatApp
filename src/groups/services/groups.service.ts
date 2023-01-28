@@ -27,6 +27,7 @@ export class GroupsService implements IGroupService {
             .createQueryBuilder('group')
             .leftJoinAndSelect('group.users', 'user')
             .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
+            .leftJoinAndSelect('group.users', 'users')
             .where('user.id = :userId', { userId: params.userId })
             .getMany();
     }

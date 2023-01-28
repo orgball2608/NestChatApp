@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { Routes, Services } from '../../utils/constants';
 import { AuthUser } from '../../utils/decorator';
 import { User } from '../../utils/typeorm';
 import { CreateGroupMessageDto } from '../dtos/CreateGroupMessage.dto';
 import { getGroupMessagesResponse } from '../../utils/types';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EditGroupMessageDto } from '../dtos/EditGroupMessage.dto';
 
 @Controller(Routes.GROUP_MESSAGES)
 export class GroupMessagesController {
@@ -54,5 +55,23 @@ export class GroupMessagesController {
             groupId,
         });
         return { groupId, messageId };
+    }
+
+    @Patch(':messageId')
+    async editGroupMessage(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) groupId: number,
+        @Param('messageId', ParseIntPipe) messageId: number,
+        @Body() { content }: EditGroupMessageDto,
+    ) {
+        const editedMessage = await this.groupMessageService.editGroupMessage({
+            userId: user.id,
+            groupId,
+            messageId,
+            content,
+        });
+
+        this.eventEmitter.emit('group.message.update', editedMessage);
+        return editedMessage;
     }
 }

@@ -3,7 +3,12 @@ import { IGroupMessageService } from '../interfaces/group-messages';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group, GroupMessage } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
-import { CreateGroupMessageParams, DeleteGroupMessageParams, getGroupMessagesParams } from '../../utils/types';
+import {
+    CreateGroupMessageParams,
+    DeleteGroupMessageParams,
+    EditGroupMessageParams,
+    getGroupMessagesParams,
+} from '../../utils/types';
 import { Services } from '../../utils/constants';
 import { IGroupService } from '../interfaces/groups';
 import { instanceToPlain } from 'class-transformer';
@@ -100,5 +105,26 @@ export class GroupMessagesService implements IGroupMessageService {
             );
             return this.groupMessageRepository.delete({ id: messageId });
         }
+    }
+
+    async editGroupMessage(params: EditGroupMessageParams) {
+        const { userId, messageId, groupId, content } = params;
+        const messageDB = await this.groupMessageRepository.findOne({
+            where: {
+                id: messageId,
+                author: {
+                    id: userId,
+                },
+                group: {
+                    id: groupId,
+                },
+            },
+            relations: ['group', 'group.creator', 'group.users', 'author'],
+        });
+
+        if (!messageDB) throw new HttpException('Cannot Edit Group Message', HttpStatus.BAD_REQUEST);
+        messageDB.content = content;
+
+        return this.groupMessageRepository.save(messageDB);
     }
 }
