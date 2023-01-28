@@ -7,12 +7,18 @@ import {
     MessageBody,
     OnGatewayConnection,
     ConnectedSocket,
+    OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
-import { CreateGroupMessageResponse, CreateMessageResponse, DeleteMessageParams } from '../utils/types';
+import {
+    AddGroupUserResponse,
+    CreateGroupMessageResponse,
+    CreateMessageResponse,
+    DeleteMessageParams,
+} from '../utils/types';
 import { Conversation, GroupMessage } from '../utils/typeorm';
 
 @WebSocketGateway({
@@ -21,16 +27,19 @@ import { Conversation, GroupMessage } from '../utils/typeorm';
         credentials: true,
     },
 })
-export class MessagingGateway implements OnGatewayConnection {
+export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         @Inject(Services.GATEWAY_SESSION_MANAGER)
         private readonly sessions: IGatewaySessionManager,
         @Inject(Services.CONVERSATIONS)
         private readonly conversationService,
+        @Inject(Services.GROUPS)
+        private readonly groupService,
     ) {}
 
     handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
         this.sessions.setUserSocket(socket.user.id, socket);
+        console.log('new coming connect');
         socket.emit('connected');
     }
     @WebSocketServer()
@@ -168,5 +177,41 @@ export class MessagingGateway implements OnGatewayConnection {
         console.log('Inside group.message.update');
         const { id } = payload.group;
         this.server.to(`group-${id}`).emit('onEditGroupMessage', payload);
+    }
+
+    handleDisconnect(socket: AuthenticatedSocket) {
+        console.log('handleDisconnect');
+        console.log(`${socket.user.email} disconnected.`);
+        this.sessions.removeUserSocket(socket.user.id);
+    }
+
+    @SubscribeMessage('getOnlineGroupUsers')
+    async handleGetOnlineGroupUsers(@MessageBody() data: any, @ConnectedSocket() socket: AuthenticatedSocket) {
+        console.log('handleGetOnlineGroupUsers');
+        console.log(data);
+        const group = await this.groupService.findGroupById(parseInt(data.groupId));
+        if (!group) return;
+        const onlineUsers = [];
+        const offlineUsers = [];
+        group.users.forEach((user) => {
+            const socket = this.sessions.getUserSocket(user.id);
+            socket ? onlineUsers.push(user) : offlineUsers.push(user);
+        });
+
+        console.log(onlineUsers);
+        console.log(offlineUsers);
+
+        socket.emit('onlineGroupUsersReceived', { onlineUsers, offlineUsers });
+    }
+
+    @OnEvent('group.recipients.add')
+    handleGroupUserAdd(payload: AddGroupUserResponse) {
+        const {
+            group: { id },
+        } = payload;
+        console.log('inside group.user.add');
+        const recipientSocket = this.sessions.getUserSocket(payload.user.id);
+        recipientSocket && recipientSocket.emit('onGroupUserAdd', payload);
+        this.server.to(`group-${id}`).emit('onGroupReceivedNewUser', payload);
     }
 }

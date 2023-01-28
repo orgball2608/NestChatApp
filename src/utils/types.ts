@@ -65,6 +65,11 @@ export type GetGroupsByIdParams = {
     userId: number;
 };
 
+export type AddGroupUserResponse = {
+    user: User;
+    group: Group;
+};
+
 export type CreateGroupMessageParams = {
     groupId: number;
     content: string;
@@ -101,4 +106,10 @@ export type EditGroupMessageParams = {
     groupId: number;
     messageId: number;
     content: string;
+};
+
+export type AddGroupRecipientParams = {
+    groupId: number;
+    email: string;
+    userId: number;
 };
