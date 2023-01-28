@@ -1,18 +1,24 @@
 import { Module } from '@nestjs/common';
-import { GroupsController } from './groups.controller';
-import { GroupsService } from './groups.service';
+import { GroupsController } from './controllers/groups.controller';
+import { GroupsService } from './services/groups.service';
 import { Services } from '../utils/constants';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Group } from '../utils/typeorm';
+import { Group, GroupMessage } from '../utils/typeorm';
 import { UsersModule } from '../users/users.module';
+import { GroupMessagesService } from './services/group-messages.service';
+import { GroupMessagesController } from './controllers/group-messages.controller';
 
 @Module({
-    imports: [UsersModule, TypeOrmModule.forFeature([Group])],
-    controllers: [GroupsController],
+    imports: [UsersModule, TypeOrmModule.forFeature([Group, GroupMessage])],
+    controllers: [GroupsController, GroupMessagesController],
     providers: [
         {
             provide: Services.GROUPS,
             useClass: GroupsService,
+        },
+        {
+            provide: Services.GROUP_MESSAGES,
+            useClass: GroupMessagesService,
         },
     ],
     exports: [

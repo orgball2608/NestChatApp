@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
-import { Routes, Services } from '../utils/constants';
-import { AuthUser } from '../utils/decorator';
-import { User } from '../utils/typeorm';
-import { CreateGroupMessageDto } from './dtos/CreateGroupMessage.dto';
-import { getGroupMessagesResponse } from '../utils/types';
+import { Routes, Services } from '../../utils/constants';
+import { AuthUser } from '../../utils/decorator';
+import { User } from '../../utils/typeorm';
+import { CreateGroupMessageDto } from '../dtos/CreateGroupMessage.dto';
+import { getGroupMessagesResponse } from '../../utils/types';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller(Routes.GROUP_MESSAGES)

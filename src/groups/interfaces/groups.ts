@@ -1,5 +1,5 @@
-import { CreateGroupParams, FindUserSelectOption, GetGroupsByIdParams, GetGroupsParams } from '../utils/types';
-import { Group } from '../utils/typeorm';
+import { CreateGroupParams, FindUserSelectOption, GetGroupsByIdParams, GetGroupsParams } from '../../utils/types';
+import { Group } from '../../utils/typeorm';
 
 export interface IGroupService {
     createGroup(params: CreateGroupParams, options?: FindUserSelectOption);

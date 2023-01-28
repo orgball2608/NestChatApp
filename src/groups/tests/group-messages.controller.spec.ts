@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GroupMessagesController } from '../group-messages.controller';
+import { GroupMessagesController } from '../controllers/group-messages.controller';
 
 describe('GroupMessagesController', () => {
     let controller: GroupMessagesController;
