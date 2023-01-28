@@ -43,7 +43,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @SubscribeMessage('onConversationLeave')
     onConversationLeave(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
-        client.to(data.conversationId).emit('userJoin');
+        client.to(data.conversationId).emit('userLeave');
     }
 
     @SubscribeMessage('onTypingStart')
@@ -145,5 +145,21 @@ export class MessagingGateway implements OnGatewayConnection {
         console.log('Inside group.message.create');
         const { id } = payload.group;
         this.server.to(`group-${id}`).emit('onGroupMessage', payload);
+    }
+
+    @OnEvent('group.create')
+    handleGroupCreateEvent(payload) {
+        console.log('Inside group.create');
+        payload.users.forEach((user) => {
+            const socket = this.sessions.getUserSocket(user.id);
+            socket && socket.emit('onGroupCreate', payload);
+        });
+    }
+
+    @OnEvent('group`.message.delete')
+    handleGroupMessageDelete(payload) {
+        console.log('Inside group.message.delete');
+        const { groupId } = payload;
+        this.server.to(`group-${groupId}`).emit('onGroupMessage', payload);
     }
 }

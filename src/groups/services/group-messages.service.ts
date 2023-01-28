@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IGroupMessageService } from '../interfaces/group-messages';
 import { InjectRepository } from '@nestjs/typeorm';
-import { GroupMessage } from '../../utils/typeorm';
+import { Group, GroupMessage } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
-import { CreateGroupMessageParams, getGroupMessagesParams } from '../../utils/types';
+import { CreateGroupMessageParams, DeleteGroupMessageParams, getGroupMessagesParams } from '../../utils/types';
 import { Services } from '../../utils/constants';
 import { IGroupService } from '../interfaces/groups';
 import { instanceToPlain } from 'class-transformer';
@@ -13,6 +13,7 @@ export class GroupMessagesService implements IGroupMessageService {
     constructor(
         @InjectRepository(GroupMessage) private readonly groupMessageRepository: Repository<GroupMessage>,
         @Inject(Services.GROUPS) private readonly groupService: IGroupService,
+        @InjectRepository(Group) private readonly groupRepository: Repository<Group>,
     ) {}
     async createGroupMessage(params: CreateGroupMessageParams) {
         const { author, groupId, content } = params;
@@ -43,5 +44,61 @@ export class GroupMessagesService implements IGroupMessageService {
                 createdAt: 'DESC',
             },
         });
+    }
+
+    async deleteGroupMessage(params: DeleteGroupMessageParams) {
+        const { userId, groupId, messageId } = params;
+        const group = await this.groupRepository
+            .createQueryBuilder('group')
+            .where('id = :groupId', { groupId: groupId })
+            .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
+            .leftJoinAndSelect('group.messages', 'message')
+            .where('group.id = :groupId', {
+                conversationId: groupId,
+            })
+            .orderBy('message.createdAt', 'DESC')
+            .limit(5)
+            .getOne();
+
+        if (!group) throw new HttpException('Group not found', HttpStatus.BAD_REQUEST);
+
+        const message = await this.groupMessageRepository.findOne({
+            id: messageId,
+            author: { id: userId },
+            group: {
+                id: groupId,
+            },
+        });
+
+        if (!message) throw new HttpException('Cannot delete message', HttpStatus.BAD_REQUEST);
+
+        if (group.lastMessageSent.id !== message.id) return this.groupMessageRepository.delete({ id: messageId });
+
+        const size = group.messages.length;
+        const SECOND_GROUP_MESSAGE_INDEX = 1;
+        if (size <= 1) {
+            console.log('Last Message Sent is deleted');
+            await this.groupRepository.update(
+                {
+                    id: groupId,
+                },
+                {
+                    lastMessageSent: null,
+                },
+            );
+            return this.groupMessageRepository.delete({ id: messageId });
+        } else {
+            console.log('There are more than 1 message');
+            const newLastMessage = group.messages[SECOND_GROUP_MESSAGE_INDEX];
+            await this.groupRepository.update(
+                {
+                    id: groupId,
+                },
+                {
+                    lastMessageSent: newLastMessage,
+                },
+            );
+            return this.groupMessageRepository.delete({ id: messageId });
+        }
     }
 }

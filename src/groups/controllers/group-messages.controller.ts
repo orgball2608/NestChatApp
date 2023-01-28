@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { Routes, Services } from '../../utils/constants';
 import { AuthUser } from '../../utils/decorator';
 import { User } from '../../utils/typeorm';
@@ -34,5 +34,25 @@ export class GroupMessagesController {
     ): Promise<getGroupMessagesResponse> {
         const messages = await this.groupMessageService.getGroupMessages({ id, author: user });
         return { id, messages };
+    }
+
+    @Delete(':messageId')
+    async deleteGroupMessage(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) groupId: number,
+        @Param('messageId', ParseIntPipe) messageId: number,
+    ) {
+        this.groupMessageService.deleteGroupMessage({
+            userId: user.id,
+            groupId,
+            messageId,
+        });
+
+        this.eventEmitter.emit('group.message.delete', {
+            userId: user.id,
+            messageId,
+            groupId,
+        });
+        return { groupId, messageId };
     }
 }

@@ -89,3 +89,9 @@ export type getGroupMessagesResponse = {
     id: number;
     messages: GroupMessage[];
 };
+
+export type DeleteGroupMessageParams = {
+    userId: number;
+    groupId: number;
+    messageId: number;
+};
