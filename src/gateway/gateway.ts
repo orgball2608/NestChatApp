@@ -14,7 +14,7 @@ import { Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
 import {
-    AddGroupUserResponse,
+    ActionGroupRecipientResponse,
     CreateGroupMessageResponse,
     CreateMessageResponse,
     DeleteMessageParams,
@@ -205,7 +205,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
 
     @OnEvent('group.recipients.add')
-    handleGroupUserAdd(payload: AddGroupUserResponse) {
+    handleGroupUserAdd(payload: ActionGroupRecipientResponse) {
         const {
             group: { id },
         } = payload;
@@ -213,5 +213,14 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const recipientSocket = this.sessions.getUserSocket(payload.user.id);
         recipientSocket && recipientSocket.emit('onGroupUserAdd', payload);
         this.server.to(`group-${id}`).emit('onGroupReceivedNewUser', payload);
+    }
+
+    @OnEvent('group.recipients.remove')
+    handleGroupUserRemove(payload: ActionGroupRecipientResponse) {
+        const {
+            group: { id },
+        } = payload;
+        console.log('inside group.user.removing');
+        this.server.to(`group-${id}`).emit('onGroupRemovedUser', payload);
     }
 }
