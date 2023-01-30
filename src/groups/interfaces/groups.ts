@@ -1,4 +1,10 @@
-import { CreateGroupParams, FindUserSelectOption, GetGroupsByIdParams, GetGroupsParams } from '../../utils/types';
+import {
+    CreateGroupParams,
+    EditGroupTitleParams,
+    FindUserSelectOption,
+    GetGroupsByIdParams,
+    GetGroupsParams,
+} from '../../utils/types';
 import { Group } from '../../utils/typeorm';
 
 export interface IGroupService {
@@ -6,4 +12,5 @@ export interface IGroupService {
     getGroups(params: GetGroupsParams): Promise<Group[]>;
     getGroupById(params: GetGroupsByIdParams): Promise<Group>;
     saveGroup(group: Group): Promise<Group>;
+    editGroupTitle(params: EditGroupTitleParams);
 }

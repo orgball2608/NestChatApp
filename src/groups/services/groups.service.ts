@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IGroupService } from '../interfaces/groups';
 import { Group } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
-import { CreateGroupParams, GetGroupsByIdParams, GetGroupsParams } from '../../utils/types';
+import { CreateGroupParams, EditGroupTitleParams, GetGroupsByIdParams, GetGroupsParams } from '../../utils/types';
 import { Services } from '../../utils/constants';
 import { IUserService } from '../../users/user';
 
@@ -41,10 +41,25 @@ export class GroupsService implements IGroupService {
             relations: ['creator', 'users', 'lastMessageSent'],
         });
         if (!group) return;
-        const checkUser = group.users.find((user) => user.id == userId);
+        const checkUser = group.users.find((user) => user.id === userId);
         if (checkUser) return group;
     }
     saveGroup(group: Group) {
+        return this.groupRepository.save(group);
+    }
+
+    async editGroupTitle(params: EditGroupTitleParams) {
+        const { groupId, userId, title } = params;
+        const group = await this.groupRepository.findOne({
+            where: {
+                id: groupId,
+            },
+            relations: ['creator', 'users', 'lastMessageSent'],
+        });
+        if (!group) return;
+        const checkUser = group.users.find((user) => user.id === userId);
+        if (!checkUser) return;
+        group.title = title;
         return this.groupRepository.save(group);
     }
 }

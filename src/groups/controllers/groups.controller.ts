@@ -5,6 +5,7 @@ import { AuthUser } from '../../utils/decorator';
 import { User } from '../../utils/typeorm';
 import { CreateGroupDto } from '../dtos/CreateGroup.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EditGroupTitleDto } from '../dtos/EditGroupTitle.dto';
 
 @Controller(Routes.GROUPS)
 export class GroupsController {
@@ -28,5 +29,21 @@ export class GroupsController {
     @Get(':id')
     async getGroupById(@AuthUser() user: User, @Param('id') id: number) {
         return this.groupServices.getGroupById({ id, userId: user.id });
+    }
+
+    @Post(':id')
+    async editGroupTitle(
+        @AuthUser() user: User,
+        @Param('id') id: number,
+        @Body() editGroupTitlePayload: EditGroupTitleDto,
+    ) {
+        const { title } = editGroupTitlePayload;
+        const response = await this.groupServices.editGroupTitle({
+            groupId: id,
+            userId: user.id,
+            title,
+        });
+        this.eventEmitter.emit('group.title.edit', response);
+        return response;
     }
 }

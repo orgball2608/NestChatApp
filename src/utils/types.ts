@@ -124,3 +124,9 @@ export type AddGroupUserResponse = {
     user: User;
     group: Group;
 };
+
+export type EditGroupTitleParams = {
+    userId: number;
+    groupId: number;
+    title: string;
+};

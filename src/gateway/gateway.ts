@@ -20,6 +20,7 @@ import {
     DeleteMessageParams,
 } from '../utils/types';
 import { Conversation, GroupMessage } from '../utils/typeorm';
+import { IGroupService } from '../groups/interfaces/groups';
 
 @WebSocketGateway({
     cors: {
@@ -34,7 +35,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         @Inject(Services.CONVERSATIONS)
         private readonly conversationService,
         @Inject(Services.GROUPS)
-        private readonly groupService,
+        private readonly groupService: IGroupService,
     ) {}
 
     handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
@@ -165,11 +166,11 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         });
     }
 
-    @OnEvent('group`.message.delete')
+    @OnEvent('group.message.delete')
     handleGroupMessageDelete(payload) {
         console.log('Inside group.message.delete');
         const { groupId } = payload;
-        this.server.to(`group-${groupId}`).emit('onGroupMessage', payload);
+        this.server.to(`group-${groupId}`).emit('onDeleteGroupMessage', payload);
     }
 
     @OnEvent('group.message.update')
@@ -188,8 +189,8 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     @SubscribeMessage('getOnlineGroupUsers')
     async handleGetOnlineGroupUsers(@MessageBody() data: any, @ConnectedSocket() socket: AuthenticatedSocket) {
         console.log('handleGetOnlineGroupUsers');
-        console.log(data);
-        const group = await this.groupService.findGroupById(parseInt(data.groupId));
+        const { groupId, userId } = data;
+        const group = await this.groupService.getGroupById({ id: parseInt(groupId), userId });
         if (!group) return;
         const onlineUsers = [];
         const offlineUsers = [];
@@ -197,9 +198,6 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
             const socket = this.sessions.getUserSocket(user.id);
             socket ? onlineUsers.push(user) : offlineUsers.push(user);
         });
-
-        console.log(onlineUsers);
-        console.log(offlineUsers);
 
         socket.emit('onlineGroupUsersReceived', { onlineUsers, offlineUsers });
     }
@@ -222,5 +220,11 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         } = payload;
         console.log('inside group.user.removing');
         this.server.to(`group-${id}`).emit('onGroupRemovedUser', payload);
+    }
+
+    @OnEvent('group.title.edit')
+    handleGroupTitleEdit(payload) {
+        const { id } = payload;
+        this.server.to(`group-${id}`).emit('onEditGroupTitle', payload);
     }
 }
