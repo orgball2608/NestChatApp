@@ -130,3 +130,12 @@ export type EditGroupTitleParams = {
     groupId: number;
     title: string;
 };
+
+export type ImagePermission = 'public-read' | 'private';
+export type UploadImageParams = {
+    key: string;
+    file: Express.Multer.File;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Attachment extends Express.Multer.File {}
