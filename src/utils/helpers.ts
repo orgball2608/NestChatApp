@@ -19,7 +19,6 @@ export const generateUUIDV4 = () => uuidv4();
 export const compressImage = (attachment: Attachment) => sharp(attachment.buffer).resize(300).jpeg().toBuffer();
 
 export function isAuthorized(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    console.log('isAuthorized');
     if (req.user) next();
     else throw new HttpException('Forbidden', HttpStatus.UNAUTHORIZED);
 }

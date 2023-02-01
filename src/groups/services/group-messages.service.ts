@@ -58,6 +58,7 @@ export class GroupMessagesService implements IGroupMessageService {
             .where('id = :groupId', { groupId: groupId })
             .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
             .leftJoinAndSelect('group.messages', 'message')
+            .leftJoinAndSelect('group.owner', 'owner')
             .where('group.id = :groupId', {
                 conversationId: groupId,
             })

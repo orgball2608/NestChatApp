@@ -20,7 +20,7 @@ export class GroupRecipientsService implements IGroupRecipientService {
         if (!group) throw new GroupNotFoundException();
         const recipient = await this.userService.findUser({ email });
         if (!recipient) throw new HttpException('User of Email Not Found', HttpStatus.BAD_REQUEST);
-        if (group.creator.id !== userId) throw new NotGroupOwnerException();
+        if (group.owner.id !== userId) throw new NotGroupOwnerException();
         const userInGroup = group.users.find((user) => user.id === recipient.id);
         if (userInGroup) throw new HttpException('User already in group', HttpStatus.BAD_REQUEST);
         group.users = [...group.users, recipient];
@@ -39,8 +39,8 @@ export class GroupRecipientsService implements IGroupRecipientService {
         });
         if (!userToBeRemoved) throw new HttpException('User cannot be removed', HttpStatus.BAD_REQUEST);
         if (!group) throw new GroupNotFoundException();
-        if (group.creator.id !== userId) throw new NotGroupOwnerException();
-        if (group.creator.id === removeUserId)
+        if (group.owner.id !== userId) throw new NotGroupOwnerException();
+        if (group.owner.id === removeUserId)
             throw new HttpException('Cannot remove yourself as owner', HttpStatus.BAD_REQUEST);
         group.users = group.users.filter((user) => user.id !== removeUserId);
         const savedGroup = await this.groupService.saveGroup(group);

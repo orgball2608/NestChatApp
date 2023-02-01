@@ -1,5 +1,6 @@
 import {
     AccessParams,
+    changeOwnerParams,
     CreateGroupParams,
     EditGroupTitleParams,
     FindUserSelectOption,
@@ -15,4 +16,6 @@ export interface IGroupService {
     saveGroup(group: Group): Promise<Group>;
     editGroupTitle(params: EditGroupTitleParams);
     hasAccess({ id, userId }: AccessParams): Promise<User>;
+    updateOwner();
+    changeOwner(params: changeOwnerParams): Promise<Group>;
 }
