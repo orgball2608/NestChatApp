@@ -65,6 +65,7 @@ export class GroupsController {
             userId: user.id,
             newOwnerId,
         });
+        this.eventEmitter.emit('group.owner.change', response);
         return response;
     }
 }

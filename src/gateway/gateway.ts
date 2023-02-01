@@ -232,4 +232,10 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const { id } = payload;
         this.server.to(`group-${id}`).emit('onEditGroupTitle', payload);
     }
+
+    @OnEvent('group.owner.change')
+    handleGroupOwnerChange(payload) {
+        const { id } = payload;
+        this.server.to(`group-${id}`).emit('onGroupOwnerChange', payload);
+    }
 }
