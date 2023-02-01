@@ -141,7 +141,7 @@ export type UploadImageParams = {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Attachment extends Express.Multer.File {}
 
-export type ConversationAccessParams = {
-    conversationId: number;
+export type AccessParams = {
+    id: number;
     userId: number;
 };

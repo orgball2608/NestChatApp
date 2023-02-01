@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { IUserService } from '../users/user';
 import { Services } from '../utils/constants';
 import { Conversation, User } from '../utils/typeorm';
-import { ConversationAccessParams, CreateConversationParams } from '../utils/types';
+import { AccessParams, CreateConversationParams } from '../utils/types';
 import { IConversationsService } from './conversations';
 import { ConversationNotFoundException } from './exceptions/ConversationNotFound';
 
@@ -68,8 +68,8 @@ export class ConversationsService implements IConversationsService {
         return this.conversationRepository.save(conversation);
     }
 
-    async hasAccess({ conversationId, userId }: ConversationAccessParams) {
-        const conversation = await this.findConversationById(conversationId);
+    async hasAccess({ id, userId }: AccessParams) {
+        const conversation = await this.findConversationById(id);
         if (!conversation) throw new ConversationNotFoundException();
         return conversation.creator.id === userId || conversation.recipient.id === userId;
     }

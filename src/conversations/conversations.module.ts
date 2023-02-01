@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { isAuthorized } from 'src/utils/helpers';
 import { UsersModule } from '../users/users.module';
 import { Services } from '../utils/constants';
 import { Conversation } from '../utils/typeorm';
@@ -25,6 +26,6 @@ import { ConversationMiddleware } from './middlewares/conversation.middleware';
 })
 export class ConversationsModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(ConversationMiddleware).forRoutes('conversations/:id');
+        consumer.apply(isAuthorized, ConversationMiddleware).forRoutes('conversations/:id');
     }
 }

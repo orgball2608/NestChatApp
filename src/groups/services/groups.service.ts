@@ -1,11 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IGroupService } from '../interfaces/groups';
-import { Group } from '../../utils/typeorm';
+import { Group, User } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
-import { CreateGroupParams, EditGroupTitleParams, GetGroupsByIdParams, GetGroupsParams } from '../../utils/types';
+import {
+    AccessParams,
+    CreateGroupParams,
+    EditGroupTitleParams,
+    GetGroupsByIdParams,
+    GetGroupsParams,
+} from '../../utils/types';
 import { Services } from '../../utils/constants';
 import { IUserService } from '../../users/user';
+import { GroupNotFoundException } from '../exceptions/GroupNotFoundException';
 
 @Injectable()
 export class GroupsService implements IGroupService {
@@ -61,5 +68,11 @@ export class GroupsService implements IGroupService {
         if (!checkUser) return;
         group.title = title;
         return this.groupRepository.save(group);
+    }
+
+    async hasAccess({ id, userId }: AccessParams): Promise<User> {
+        const group = await this.getGroupById({ id, userId });
+        if (!group) throw new GroupNotFoundException();
+        return group.users.find((user) => user.id === userId);
     }
 }
