@@ -161,3 +161,10 @@ export type CheckUserInGroupParams = {
     groupId: number;
     userId: number;
 };
+
+export type FriendStatus = 'pending' | 'accepted' | 'rejected' | 'blocked';
+
+export type CreateFriendRequestParams = {
+    user: User;
+    email: string;
+};

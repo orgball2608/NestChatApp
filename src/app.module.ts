@@ -11,6 +11,8 @@ import { GatewayModule } from './gateway/gateway.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GroupsModule } from './groups/groups.module';
 import { StorageModule } from './storage/storage.module';
+import { FriendsModule } from './friends/friends.module';
+import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 
 @Module({
     imports: [
@@ -38,6 +40,8 @@ import { StorageModule } from './storage/storage.module';
         EventEmitterModule.forRoot(),
         GroupsModule,
         StorageModule,
+        FriendsModule,
+        FriendRequestsModule,
     ],
     controllers: [],
     providers: [],
