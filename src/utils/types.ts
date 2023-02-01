@@ -1,4 +1,5 @@
 import { Conversation, Group, GroupMessage, Message, User } from './typeorm';
+import { Request } from 'express';
 
 export type CreateUserDetails = {
     email: string;
@@ -139,3 +140,8 @@ export type UploadImageParams = {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Attachment extends Express.Multer.File {}
+
+export type ConversationAccessParams = {
+    conversationId: number;
+    userId: number;
+};
