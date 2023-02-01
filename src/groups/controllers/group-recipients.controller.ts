@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { Routes, Services } from '../../utils/constants';
 import { IGroupRecipientService } from '../interfaces/group-recipients';
 import { AuthUser } from '../../utils/decorator';
@@ -40,5 +40,15 @@ export class GroupRecipientsController {
         });
 
         this.eventEmitter.emit('group.recipients.remove', response);
+    }
+
+    @Patch()
+    async leaveGroup(@AuthUser() user: User, @Param('id', ParseIntPipe) groupId: number) {
+        const response = await this.groupRecipientService.leaveGroup({
+            userId: user.id,
+            groupId,
+        });
+        this.eventEmitter.emit('group.user.leave', response);
+        return response;
     }
 }

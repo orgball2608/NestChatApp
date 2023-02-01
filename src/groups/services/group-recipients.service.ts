@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IGroupRecipientService } from '../interfaces/group-recipients';
-import { AddGroupRecipientParams, RemoveGroupRecipientParams } from '../../utils/types';
+import { AddGroupRecipientParams, CheckUserInGroupParams, RemoveGroupRecipientParams } from '../../utils/types';
 import { IGroupService } from '../interfaces/groups';
 import { IUserService } from '../../users/user';
 import { Services } from '../../utils/constants';
 import { GroupNotFoundException } from '../exceptions/GroupNotFoundException';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwnerException';
+import { Group } from 'src/utils/typeorm';
 
 @Injectable()
 export class GroupRecipientsService implements IGroupRecipientService {
@@ -45,5 +46,22 @@ export class GroupRecipientsService implements IGroupRecipientService {
         group.users = group.users.filter((user) => user.id !== removeUserId);
         const savedGroup = await this.groupService.saveGroup(group);
         return { group: savedGroup, user: userToBeRemoved };
+    }
+
+    async isUserInGroup(params: CheckUserInGroupParams): Promise<Group> {
+        const { userId, groupId } = params;
+        const group = await this.groupService.getGroupById({ id: groupId, userId });
+        if (!group) throw new GroupNotFoundException();
+        return group;
+    }
+
+    async leaveGroup(params: CheckUserInGroupParams): Promise<Group> {
+        const { userId, groupId } = params;
+        const group = await this.groupService.getGroupById({ id: groupId, userId });
+        if (!group) throw new GroupNotFoundException();
+        if (group.owner.id === userId) throw new HttpException('Cannot leave group as owner', HttpStatus.BAD_REQUEST);
+        group.users = group.users.filter((user) => user.id !== userId);
+        const savedGroup = await this.groupService.saveGroup(group);
+        return savedGroup;
     }
 }

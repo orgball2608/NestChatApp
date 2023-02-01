@@ -238,4 +238,10 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const { id } = payload;
         this.server.to(`group-${id}`).emit('onGroupOwnerChange', payload);
     }
+
+    @OnEvent('group.user.leave')
+    handleLeaveGroup(payload) {
+        const { id } = payload;
+        this.server.to(`group-${id}`).emit('onGroupLeave', payload);
+    }
 }
