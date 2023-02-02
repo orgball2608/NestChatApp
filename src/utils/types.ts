@@ -188,3 +188,8 @@ export type CancelRequestParams = {
     userId: number;
     requestId: number;
 };
+
+export type RejectRequestParams = {
+    receiverId: number;
+    requestId: number;
+};
