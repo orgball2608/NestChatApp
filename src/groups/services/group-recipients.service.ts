@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IGroupRecipientService } from '../interfaces/group-recipients';
 import { AddGroupRecipientParams, CheckUserInGroupParams, RemoveGroupRecipientParams } from '../../utils/types';
 import { IGroupService } from '../interfaces/groups';
-import { IUserService } from '../../users/user';
+import { IUserService } from '../../users/interfaces/user';
 import { Services } from '../../utils/constants';
 import { GroupNotFoundException } from '../exceptions/GroupNotFoundException';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwnerException';

@@ -8,13 +8,13 @@ export enum Routes {
     GROUP_RECIPIENTS = 'groups/:id/recipients',
     FRIENDS = 'friends',
     FRIEND_REQUESTS = 'friend-requests',
+    USER_PROFILE = 'user-profile',
 }
 
 export enum Services {
     AUTH = 'AUTH_SERVICE',
     USERS = 'USERS_SERVICE',
     CONVERSATIONS = 'CONVERSATIONS_SERVICE',
-
     MESSAGES = 'MESSAGES_SERVICE',
     GATEWAY_SESSION_MANAGER = 'GATEWAY_SESSION_MANAGER',
     GROUPS = 'GROUPS_SERVICE',
@@ -24,4 +24,5 @@ export enum Services {
     IMAGE_UPLOAD_SERVICE = 'IMAGE_UPLOAD_SERVICE',
     FRIENDS = 'FRIENDS_SERVICE',
     FRIEND_REQUESTS = 'FRIEND_REQUESTS_SERVICE',
+    USER_PROFILE = 'USER_PROFILE_SERVICE',
 }

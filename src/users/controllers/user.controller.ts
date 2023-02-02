@@ -1,5 +1,5 @@
 import { Controller, Get, HttpException, HttpStatus, Inject, Query } from '@nestjs/common';
-import { Services } from '../utils/constants';
+import { Services } from '../../utils/constants';
 
 @Controller('user')
 export class UserController {

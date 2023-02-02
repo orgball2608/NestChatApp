@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
-import { IUserService } from 'src/users/user';
+import { IUserService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import { Friend, User } from 'src/utils/typeorm';
 import { DeleteFriendParams, GetFriendParams } from 'src/utils/types';

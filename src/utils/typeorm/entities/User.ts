@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Group } from './Group';
 import { Message } from './Message';
+import { Profile } from './Profile';
 
 @Entity({ name: 'users' })
 export class User {
@@ -27,4 +28,10 @@ export class User {
 
     @ManyToMany(() => Group, (group) => group.users)
     groups: Group[];
+
+    @OneToOne(() => Profile, {
+        cascade: ['insert', 'update'],
+    })
+    @JoinColumn()
+    profile: Profile;
 }

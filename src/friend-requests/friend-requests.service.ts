@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
-import { IUserService } from 'src/users/user';
+import { IUserService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import { Friend, FriendRequest } from 'src/utils/typeorm';
 import {
@@ -29,6 +29,8 @@ export class FriendRequestsService implements IFriendRequestService {
     async createFriendRequest({ user: sender, email }: CreateFriendRequestParams) {
         const receiver = await this.usersService.findUser({ email });
         if (!receiver) throw new UserNotFoundException();
+
+        if (sender.id === receiver.id) throw new FriendRequestException();
 
         const exitsRequest = await this.requestIsPending(sender.id, receiver.id);
         if (exitsRequest) throw new FriendRequestException();

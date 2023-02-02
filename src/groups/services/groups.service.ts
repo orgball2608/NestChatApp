@@ -12,7 +12,7 @@ import {
     GetGroupsParams,
 } from '../../utils/types';
 import { Services } from '../../utils/constants';
-import { IUserService } from '../../users/user';
+import { IUserService } from '../../users/interfaces/user';
 import { GroupNotFoundException } from '../exceptions/GroupNotFoundException';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwnerException';
 import { UserNotFoundException } from '../exceptions/UserNotFound';

@@ -3,7 +3,7 @@ import { Routes, Services } from '../utils/constants';
 import { Request, Response } from 'express';
 import { IAuthService } from './auth';
 import { CreateUserDto } from './dtos/CreateUser.dto';
-import { IUserService } from '../users/user';
+import { IUserService } from '../users/interfaces/user';
 import { instanceToPlain } from 'class-transformer';
 import { AuthenticatedGuard, LocalAuthGuard } from './utils/Guards';
 
