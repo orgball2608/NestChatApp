@@ -193,3 +193,10 @@ export type RejectRequestParams = {
     receiverId: number;
     requestId: number;
 };
+
+export type UpdateProfileParams = Partial<{
+    bio: string;
+    banner: Express.Multer.File;
+    avatar: Express.Multer.File;
+    location: string;
+}>;

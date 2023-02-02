@@ -6,9 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Profile, User } from '../utils/typeorm';
 import { UserProfileController } from './controllers/user-profile.controller';
 import { UserProfileService } from './services/user-profile.service';
+import { StorageModule } from 'src/storage/storage.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, Profile])],
+    imports: [TypeOrmModule.forFeature([User, Profile]), StorageModule, UsersModule],
     providers: [
         {
             provide: Services.USERS,

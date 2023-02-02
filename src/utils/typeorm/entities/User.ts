@@ -29,9 +29,7 @@ export class User {
     @ManyToMany(() => Group, (group) => group.users)
     groups: Group[];
 
-    @OneToOne(() => Profile, {
-        cascade: ['insert', 'update'],
-    })
+    @OneToOne(() => Profile, { cascade: ['insert', 'update'] })
     @JoinColumn()
     profile: Profile;
 }
