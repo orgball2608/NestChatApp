@@ -173,3 +173,13 @@ export type AcceptRequestParams = {
     id: number;
     userId: number;
 };
+
+export type DeleteFriendParams = {
+    userId: number;
+    removeUserId: number;
+};
+
+export type GetFriendParams = {
+    userId: number;
+    friendId: number;
+};
