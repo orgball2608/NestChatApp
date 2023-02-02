@@ -183,3 +183,8 @@ export type GetFriendParams = {
     userId: number;
     friendId: number;
 };
+
+export type CancelRequestParams = {
+    userId: number;
+    requestId: number;
+};

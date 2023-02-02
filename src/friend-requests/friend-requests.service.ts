@@ -4,7 +4,7 @@ import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
 import { IUserService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { Friend, FriendRequest } from 'src/utils/typeorm';
-import { AcceptRequestParams, CreateFriendRequestParams } from 'src/utils/types';
+import { AcceptRequestParams, CancelRequestParams, CreateFriendRequestParams } from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { FriendRequestException } from './exceptions/FriendRequest';
 import { FriendRequestAcceptedException } from './exceptions/FriendRequestAccepted';
@@ -71,10 +71,12 @@ export class FriendRequestsService implements IFriendRequestService {
     }
 
     async getRequestById(id: number) {
-        return this.friendRequestRepository.findOne({
+        const request = await this.friendRequestRepository.findOne({
             where: { id },
             relations: ['sender', 'receiver'],
         });
+        if (!request) throw new FriendRequestNotFoundException();
+        return request;
     }
 
     async acceptRequest(params: AcceptRequestParams): Promise<Friend> {
@@ -91,5 +93,14 @@ export class FriendRequestsService implements IFriendRequestService {
             receiver: friendRequest.receiver,
         });
         return this.friendRepository.save(friend);
+    }
+
+    async cancelRequest(params: CancelRequestParams) {
+        const { userId, requestId } = params;
+        const friendRequest = await this.getRequestById(requestId);
+        if (!friendRequest) throw new FriendRequestNotFoundException();
+        if (friendRequest.status === 'accepted') throw new FriendRequestAcceptedException();
+        if (friendRequest.sender.id !== userId) throw new FriendRequestNotFoundException();
+        return this.friendRequestRepository.delete(requestId);
     }
 }

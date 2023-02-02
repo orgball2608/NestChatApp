@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Post } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
 import { User } from 'src/utils/typeorm';
@@ -22,5 +22,10 @@ export class FriendRequestsController {
     @Post(':id/accept')
     async acceptFriendRequest(@AuthUser() user: User, @Param('id') id: number) {
         return await this.friendRequestsService.acceptRequest({ userId: user.id, id });
+    }
+
+    @Delete(':id/cancel')
+    cancelFriendRequest(@AuthUser() user: User, @Param('id') requestId: number) {
+        return this.friendRequestsService.cancelRequest({ userId: user.id, requestId });
     }
 }
