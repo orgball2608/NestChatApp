@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Inject, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    FileTypeValidator,
+    Get,
+    Inject,
+    MaxFileSizeValidator,
+    Param,
+    ParseFilePipe,
+    Post,
+    UploadedFile,
+    UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
@@ -18,14 +30,36 @@ export class UserProfileController {
 
     @UseInterceptors(FileInterceptor('banner'))
     @Post('update/banner')
-    updateBanner(@AuthUser() user: User, @UploadedFile() file) {
+    updateBanner(
+        @AuthUser() user: User,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }),
+                    new MaxFileSizeValidator({ maxSize: 5242880 }),
+                ],
+            }),
+        )
+        file,
+    ) {
         const params = { banner: file };
         return this.userProfileService.updateBanner(user, params);
     }
 
     @UseInterceptors(FileInterceptor('avatar'))
     @Post('update/avatar')
-    updateAvatar(@AuthUser() user: User, @UploadedFile() file) {
+    updateAvatar(
+        @AuthUser() user: User,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }),
+                    new MaxFileSizeValidator({ maxSize: 5242880 }),
+                ],
+            }),
+        )
+        file,
+    ) {
         const params = { avatar: file };
         return this.userProfileService.updateAvatar(user, params);
     }

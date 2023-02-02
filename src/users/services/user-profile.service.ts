@@ -28,6 +28,7 @@ export class UserProfileService implements IUserProfileService {
 
     async updateBanner(user, params: UpdateProfileParams) {
         const { banner } = params;
+        console.log(banner);
         if (user.profile) {
             // const bannerKey = user.profile.avatar.split('/').pop();
             // await this.imageUploadService.deleteFile(bannerKey);
@@ -37,7 +38,6 @@ export class UserProfileService implements IUserProfileService {
                 key,
             });
             user.profile.banner = bannerUrl;
-            await this.imageUploadService.deleteFile(key);
             await this.profileRepository.save(user.profile);
             return this.userService.saveUser(user);
         }
