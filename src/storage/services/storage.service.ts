@@ -32,8 +32,8 @@ export class StorageService implements IStorage {
             key;
         return url;
     }
-    async deleteFile(key: string) {
-        return await this.spacesClient
+    deleteFile(key: string) {
+        return this.spacesClient
             .deleteObject({
                 Bucket: process.env.AWS_PUBLIC_BUCKET_KEY,
                 Key: String(key),

@@ -16,14 +16,14 @@ export class UserProfileController {
         return this.userProfileService.getProfile(user);
     }
 
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('banner'))
     @Post('update/banner')
     updateBanner(@AuthUser() user: User, @UploadedFile() file) {
         const params = { banner: file };
         return this.userProfileService.updateBanner(user, params);
     }
 
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('avatar'))
     @Post('update/avatar')
     updateAvatar(@AuthUser() user: User, @UploadedFile() file) {
         const params = { avatar: file };
