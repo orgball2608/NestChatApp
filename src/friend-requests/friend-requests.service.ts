@@ -4,12 +4,15 @@ import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
 import { IUserService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { Friend, FriendRequest } from 'src/utils/typeorm';
-import { CreateFriendRequestParams } from 'src/utils/types';
+import { AcceptRequestParams, CreateFriendRequestParams } from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { FriendRequestException } from './exceptions/FriendRequest';
+import { FriendRequestAcceptedException } from './exceptions/FriendRequestAccepted';
+import { FriendRequestNotFoundException } from './exceptions/FriendRequestNotFound';
+import { IFriendRequestService } from './friend-requests';
 
 @Injectable()
-export class FriendRequestsService {
+export class FriendRequestsService implements IFriendRequestService {
     constructor(
         @InjectRepository(FriendRequest)
         private readonly friendRequestRepository: Repository<FriendRequest>,
@@ -72,5 +75,21 @@ export class FriendRequestsService {
             where: { id },
             relations: ['sender', 'receiver'],
         });
+    }
+
+    async acceptRequest(params: AcceptRequestParams): Promise<Friend> {
+        const { id, userId } = params;
+        const friendRequest = await this.getRequestById(id);
+        if (!friendRequest) throw new FriendRequestNotFoundException();
+        if (friendRequest.status === 'accepted') throw new FriendRequestAcceptedException();
+        if (friendRequest.receiver.id !== userId) throw new FriendRequestNotFoundException();
+
+        friendRequest.status = 'accepted';
+        await this.friendRequestRepository.save(friendRequest);
+        const friend = this.friendRepository.create({
+            sender: friendRequest.sender,
+            receiver: friendRequest.receiver,
+        });
+        return this.friendRepository.save(friend);
     }
 }

@@ -168,3 +168,8 @@ export type CreateFriendRequestParams = {
     user: User;
     email: string;
 };
+
+export type AcceptRequestParams = {
+    id: number;
+    userId: number;
+};

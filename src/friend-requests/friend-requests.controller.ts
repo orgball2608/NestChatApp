@@ -18,4 +18,9 @@ export class FriendRequestsController {
     async getFriendRequest(@Param('id') id: number) {
         return await this.friendRequestsService.getRequestById(id);
     }
+
+    @Post(':id/accept')
+    async acceptFriendRequest(@AuthUser() user: User, @Param('id') id: number) {
+        return await this.friendRequestsService.acceptRequest({ userId: user.id, id });
+    }
 }
