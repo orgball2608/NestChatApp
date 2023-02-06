@@ -6,15 +6,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Friend, FriendRequest } from 'src/utils/typeorm';
 import { Services } from 'src/utils/constants';
 import { UsersModule } from 'src/users/users.module';
+import { GatewayModule } from 'src/gateway/gateway.module';
+import { FriendRequestsEvent } from './friend-requests.event';
 
 @Module({
-    imports: [FriendsModule, UsersModule, TypeOrmModule.forFeature([FriendRequest, Friend])],
+    imports: [FriendsModule, GatewayModule, UsersModule, TypeOrmModule.forFeature([FriendRequest, Friend])],
     controllers: [FriendRequestsController],
     providers: [
         {
             provide: Services.FRIEND_REQUESTS,
             useClass: FriendRequestsService,
         },
+        FriendRequestsEvent,
     ],
     exports: [
         {

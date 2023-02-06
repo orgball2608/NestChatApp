@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Inject, Param, Patch, Post } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthService } from 'src/auth/auth.service';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
@@ -8,11 +9,16 @@ import { FriendRequestsService } from './friend-requests.service';
 
 @Controller(Routes.FRIEND_REQUESTS)
 export class FriendRequestsController {
-    constructor(@Inject(Services.FRIEND_REQUESTS) private readonly friendRequestsService: FriendRequestsService) {}
+    constructor(
+        @Inject(Services.FRIEND_REQUESTS) private readonly friendRequestsService: FriendRequestsService,
+        private event: EventEmitter2,
+    ) {}
 
     @Post()
     async createFriendRequest(@AuthUser() user: User, @Body() { email }: CreateFriendRequestDto) {
-        return this.friendRequestsService.createFriendRequest({ user, email });
+        const friendRequest = await this.friendRequestsService.createFriendRequest({ user, email });
+        this.event.emit('friendrequest.create', friendRequest);
+        return friendRequest;
     }
 
     @Get(':id')

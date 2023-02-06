@@ -31,7 +31,7 @@ import { IGroupService } from '../groups/interfaces/groups';
 export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         @Inject(Services.GATEWAY_SESSION_MANAGER)
-        private readonly sessions: IGatewaySessionManager,
+        readonly sessions: IGatewaySessionManager,
         @Inject(Services.CONVERSATIONS)
         private readonly conversationService,
         @Inject(Services.GROUPS)
