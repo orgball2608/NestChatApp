@@ -40,6 +40,7 @@ export class GroupRecipientsController {
         });
 
         this.eventEmitter.emit('group.recipients.remove', response);
+        return response;
     }
 
     @Patch()

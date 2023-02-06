@@ -53,9 +53,10 @@ export class GroupsService implements IGroupService {
             relations: ['creator', 'users', 'lastMessageSent', 'owner'],
         });
         if (!group) throw new GroupNotFoundException();
-        const checkUser = group.users.find((user) => user.id === userId);
-        if (!checkUser) throw new UserNotFoundException();
-        if (checkUser) return group;
+        // const checkUser = group.users.find((user) => user.id === userId);
+        // if (checkUser) return group;
+        // else console.log('User not found');
+        return group;
     }
     saveGroup(group: Group) {
         return this.groupRepository.save(group);

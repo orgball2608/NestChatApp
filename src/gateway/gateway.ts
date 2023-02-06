@@ -219,11 +219,6 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
             group: { id },
         } = payload;
         console.log('inside group.user.remove');
-        const recipientSocket = this.sessions.getUserSocket(payload.user.id);
-        if (recipientSocket) {
-            recipientSocket.emit('onGroupRemoved', payload);
-            recipientSocket.leave(`group-${id}`);
-        }
         this.server.to(`group-${id}`).emit('onGroupRemovedUser', payload);
     }
 

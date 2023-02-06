@@ -120,4 +120,13 @@ export class FriendRequestsService implements IFriendRequestService {
         friendRequest.status = 'rejected';
         return this.friendRequestRepository.save(friendRequest);
     }
+
+    getRequestsByUserId(userId:number): Promise<FriendRequest[]> {
+        return this.friendRequestRepository.find({
+            where: { status: 'pending' , receiver: {
+                id: userId
+            }},
+            relations: ['sender', 'receiver'],
+        });
+    }
 }

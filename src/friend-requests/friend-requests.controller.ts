@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Inject, Param, Patch, Post } from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
 import { User } from 'src/utils/typeorm';
@@ -17,6 +18,12 @@ export class FriendRequestsController {
     @Get(':id')
     async getFriendRequest(@Param('id') id: number) {
         return await this.friendRequestsService.getRequestById(id);
+    }
+
+    @Get()
+    async getFriendRequestByUserId(@AuthUser() user: User) {
+        const { id: userId } = user;
+        return await this.friendRequestsService.getRequestsByUserId(userId);
     }
 
     @Post(':id/accept')
