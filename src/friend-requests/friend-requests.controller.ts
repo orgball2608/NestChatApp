@@ -20,15 +20,21 @@ export class FriendRequestsController {
         return friendRequest;
     }
 
-    @Get(':id')
-    async getFriendRequest(@Param('id') id: number) {
-        return await this.friendRequestsService.getRequestById(id);
+    @Get('send')
+    getSendedRequestsByUserId(@AuthUser() user: User) {
+        const { id: userId } = user;
+        return this.friendRequestsService.getSendedRequestsByUserId(userId);
     }
 
     @Get()
-    async getReceiveRequestsByUserId(@AuthUser() user: User) {
+    async getReceivedRequestsByUserId(@AuthUser() user: User) {
         const { id: userId } = user;
-        return await this.friendRequestsService.getReceiveRequestsByUserId(userId);
+        return await this.friendRequestsService.getReceivedRequestsByUserId(userId);
+    }
+
+    @Get(':id')
+    async getFriendRequest(@Param('id') id: number) {
+        return await this.friendRequestsService.getRequestById(id);
     }
 
     @Post(':id/accept')

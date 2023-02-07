@@ -11,7 +11,8 @@ export interface IFriendRequestService {
     requestIsPending(userOneId: number, userTwoId: number): Promise<FriendRequest>;
     requestIsAccepted(userOneId: number, userTwoId: number): Promise<FriendRequest>;
     getRequestById(id: number): Promise<FriendRequest>;
-    getReceiveRequestsByUserId(userId: number): Promise<FriendRequest[]>;
+    getReceivedRequestsByUserId(userId: number): Promise<FriendRequest[]>;
+    getSendedRequestsByUserId(userId: number): Promise<FriendRequest[]>;
     acceptRequest(params: AcceptRequestParams);
     cancelRequest(params: CancelRequestParams);
     rejectRequest(params: RejectRequestParams): Promise<FriendRequest>;

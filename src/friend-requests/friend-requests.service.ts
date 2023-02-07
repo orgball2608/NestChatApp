@@ -130,11 +130,23 @@ export class FriendRequestsService implements IFriendRequestService {
         return this.friendRequestRepository.save(friendRequest);
     }
 
-    getReceiveRequestsByUserId(userId: number): Promise<FriendRequest[]> {
+    getReceivedRequestsByUserId(userId: number): Promise<FriendRequest[]> {
         return this.friendRequestRepository.find({
             where: {
                 status: 'pending',
                 receiver: {
+                    id: userId,
+                },
+            },
+            relations: ['sender', 'receiver'],
+        });
+    }
+
+    getSendedRequestsByUserId(userId: number): Promise<FriendRequest[]> {
+        return this.friendRequestRepository.find({
+            where: {
+                status: 'pending',
+                sender: {
                     id: userId,
                 },
             },
