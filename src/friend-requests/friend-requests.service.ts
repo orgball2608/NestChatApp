@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import console from 'console';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
 import { IUserService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
@@ -34,6 +35,9 @@ export class FriendRequestsService implements IFriendRequestService {
 
         const exitsRequest = await this.requestIsPending(sender.id, receiver.id);
         if (exitsRequest) throw new FriendRequestException();
+
+        const exitsFriend = await this.requestIsAccepted(sender.id, receiver.id);
+        if (exitsFriend) throw new FriendRequestException();
 
         const friend = this.friendRequestRepository.create({
             sender,
@@ -86,7 +90,7 @@ export class FriendRequestsService implements IFriendRequestService {
         return request;
     }
 
-    async acceptRequest(params: AcceptRequestParams): Promise<Friend> {
+    async acceptRequest(params: AcceptRequestParams) {
         const { id, userId } = params;
         const friendRequest = await this.getRequestById(id);
         if (!friendRequest) throw new FriendRequestNotFoundException();
@@ -99,7 +103,11 @@ export class FriendRequestsService implements IFriendRequestService {
             sender: friendRequest.sender,
             receiver: friendRequest.receiver,
         });
-        return this.friendRepository.save(friend);
+        const savedFriend = await this.friendRepository.save(friend);
+        return {
+            friend: savedFriend,
+            friendRequest,
+        };
     }
 
     async cancelRequest(params: CancelRequestParams) {
@@ -121,11 +129,14 @@ export class FriendRequestsService implements IFriendRequestService {
         return this.friendRequestRepository.save(friendRequest);
     }
 
-    getRequestsByUserId(userId:number): Promise<FriendRequest[]> {
+    getReceiveRequestsByUserId(userId: number): Promise<FriendRequest[]> {
         return this.friendRequestRepository.find({
-            where: { status: 'pending' , receiver: {
-                id: userId
-            }},
+            where: {
+                status: 'pending',
+                receiver: {
+                    id: userId,
+                },
+            },
             relations: ['sender', 'receiver'],
         });
     }

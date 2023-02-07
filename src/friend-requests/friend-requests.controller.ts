@@ -1,7 +1,6 @@
-import { Body, Controller, Delete, Get, Inject, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Post } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AuthService } from 'src/auth/auth.service';
-import { Routes, Services } from 'src/utils/constants';
+import { Routes, Services, WebsocketEvents } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
 import { User } from 'src/utils/typeorm';
 import { CreateFriendRequestDto } from './dtos/CreateFriendRequest.dto';
@@ -27,9 +26,9 @@ export class FriendRequestsController {
     }
 
     @Get()
-    async getFriendRequestByUserId(@AuthUser() user: User) {
+    async getReceiveRequestsByUserId(@AuthUser() user: User) {
         const { id: userId } = user;
-        return await this.friendRequestsService.getRequestsByUserId(userId);
+        return await this.friendRequestsService.getReceiveRequestsByUserId(userId);
     }
 
     @Post(':id/accept')
@@ -42,8 +41,10 @@ export class FriendRequestsController {
         return this.friendRequestsService.cancelRequest({ userId: user.id, requestId });
     }
 
-    @Patch(':id/reject')
-    rejectFriendRequest(@AuthUser() user: User, @Param('id') requestId: number) {
-        return this.friendRequestsService.rejectRequest({ receiverId: user.id, requestId });
+    @Post(':id/reject')
+    async rejectFriendRequest(@AuthUser() user: User, @Param('id') id: number) {
+        const response = await this.friendRequestsService.rejectRequest({ receiverId: user.id, requestId: id });
+        this.event.emit(WebsocketEvents.FRIEND_REQUEST_REJECTED, response);
+        return response;
     }
 }
