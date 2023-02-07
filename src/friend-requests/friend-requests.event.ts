@@ -30,4 +30,12 @@ export class FriendRequestsEvent {
         const senderSocket = this.gateway.sessions.getUserSocket(friend.sender.id);
         if (senderSocket) senderSocket.emit(WebsocketEvents.FRIEND_REQUEST_ACCEPTED, payload);
     }
+
+    @OnEvent(WebsocketEvents.FRIEND_REQUEST_CANCELLED)
+    friendRequestCANCELLED(payload: FriendRequest) {
+        console.log('friendrequest.cancel');
+        console.log(payload);
+        const receiverSocket = this.gateway.sessions.getUserSocket(payload.receiver.id);
+        if (receiverSocket) receiverSocket.emit(WebsocketEvents.FRIEND_REQUEST_CANCELLED, payload);
+    }
 }

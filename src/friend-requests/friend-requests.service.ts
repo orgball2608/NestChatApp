@@ -116,7 +116,8 @@ export class FriendRequestsService implements IFriendRequestService {
         if (!friendRequest) throw new FriendRequestNotFoundException();
         if (friendRequest.status === 'accepted') throw new FriendRequestAcceptedException();
         if (friendRequest.sender.id !== userId) throw new FriendRequestNotFoundException();
-        return this.friendRequestRepository.delete(requestId);
+        await this.friendRequestRepository.delete(requestId);
+        return friendRequest;
     }
 
     async rejectRequest(params: RejectRequestParams) {
