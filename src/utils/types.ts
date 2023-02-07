@@ -1,4 +1,4 @@
-import { Conversation, Group, GroupMessage, Message, User } from './typeorm';
+import { Conversation, Friend, FriendRequest, Group, GroupMessage, Message, User } from './typeorm';
 import { Request } from 'express';
 
 export type CreateUserDetails = {
@@ -200,3 +200,8 @@ export type UpdateProfileParams = Partial<{
     avatar: Express.Multer.File;
     location: string;
 }>;
+
+export type FriendRequestAcceptedPayload = {
+    friend: Friend;
+    friendRequest: FriendRequest;
+};

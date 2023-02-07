@@ -33,7 +33,9 @@ export class FriendRequestsController {
 
     @Post(':id/accept')
     async acceptFriendRequest(@AuthUser() user: User, @Param('id') id: number) {
-        return await this.friendRequestsService.acceptRequest({ userId: user.id, id });
+        const response = await this.friendRequestsService.acceptRequest({ userId: user.id, id });
+        this.event.emit(WebsocketEvents.FRIEND_REQUEST_ACCEPTED, response);
+        return response;
     }
 
     @Delete(':id/cancel')
