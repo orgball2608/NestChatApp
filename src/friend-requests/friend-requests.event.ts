@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { WebsocketEvents } from 'src/utils/constants';
+import { ServerEvents, WebsocketEvents } from 'src/utils/constants';
 import { FriendRequestAcceptedPayload } from 'src/utils/types';
 import { MessagingGateway } from '../gateway/gateway';
 import { FriendRequest } from '../utils/typeorm';
@@ -9,21 +9,21 @@ import { FriendRequest } from '../utils/typeorm';
 export class FriendRequestsEvent {
     constructor(private readonly gateway: MessagingGateway) {}
 
-    @OnEvent('friendrequest.create')
+    @OnEvent(ServerEvents.FRIEND_REQUEST_CREATE)
     friendRequestCreate(payload: FriendRequest) {
         console.log('friendrequest.create');
         const receiverSocket = this.gateway.sessions.getUserSocket(payload.receiver.id);
-        if (receiverSocket) receiverSocket.emit('onFriendRequestReceived', payload);
+        if (receiverSocket) receiverSocket.emit(WebsocketEvents.FRIEND_REQUEST_CREATE, payload);
     }
 
-    @OnEvent(WebsocketEvents.FRIEND_REQUEST_REJECTED)
+    @OnEvent(ServerEvents.FRIEND_REQUEST_REJECTED)
     friendRequestRejected(payload: FriendRequest) {
         console.log('friendrequest.reject');
         const senderSocket = this.gateway.sessions.getUserSocket(payload.sender.id);
         if (senderSocket) senderSocket.emit(WebsocketEvents.FRIEND_REQUEST_REJECTED, payload);
     }
 
-    @OnEvent(WebsocketEvents.FRIEND_REQUEST_ACCEPTED)
+    @OnEvent(ServerEvents.FRIEND_REQUEST_ACCEPTED)
     friendRequestAccepted(payload: FriendRequestAcceptedPayload) {
         console.log('friendrequest.accept');
         const { friend } = payload;
@@ -31,10 +31,9 @@ export class FriendRequestsEvent {
         if (senderSocket) senderSocket.emit(WebsocketEvents.FRIEND_REQUEST_ACCEPTED, payload);
     }
 
-    @OnEvent(WebsocketEvents.FRIEND_REQUEST_CANCELLED)
+    @OnEvent(ServerEvents.FRIEND_REQUEST_CANCELLED)
     friendRequestCANCELLED(payload: FriendRequest) {
         console.log('friendrequest.cancel');
-        console.log(payload);
         const receiverSocket = this.gateway.sessions.getUserSocket(payload.receiver.id);
         if (receiverSocket) receiverSocket.emit(WebsocketEvents.FRIEND_REQUEST_CANCELLED, payload);
     }
