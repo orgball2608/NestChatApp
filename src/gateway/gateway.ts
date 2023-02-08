@@ -10,7 +10,7 @@ import {
     OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { Services } from '../utils/constants';
+import { ServerEvents, Services, WebsocketEvents } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
 import {
@@ -18,6 +18,7 @@ import {
     CreateGroupMessageResponse,
     CreateMessageResponse,
     DeleteMessageParams,
+    RemoveFriendEventPayload,
 } from '../utils/types';
 import { Conversation, GroupMessage } from '../utils/typeorm';
 import { IGroupService } from '../groups/interfaces/groups';
@@ -261,5 +262,14 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
             }
             socket.emit('getStatusFriends', { onlineFriends, offlineFriends });
         }
+    }
+
+    @OnEvent(ServerEvents.FRIEND_REMOVED)
+    removedFriend(payload: RemoveFriendEventPayload) {
+        const { userId, friend } = payload;
+        console.log('inside friend.removed');
+        const { sender, receiver } = friend;
+        const friendSocket = this.sessions.getUserSocket(sender.id === userId ? receiver.id : sender.id);
+        friendSocket && friendSocket.emit('onFriendRemoved', payload);
     }
 }

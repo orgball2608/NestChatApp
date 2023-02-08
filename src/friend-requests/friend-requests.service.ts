@@ -31,12 +31,23 @@ export class FriendRequestsService implements IFriendRequestService {
         const receiver = await this.usersService.findUser({ email });
         if (!receiver) throw new UserNotFoundException();
 
-        if (sender.id === receiver.id) throw new FriendRequestException();
+        if (sender.id === receiver.id) throw new FriendRequestException('Cannot Add Yourself');
 
         const exitsRequest = await this.requestIsPending(sender.id, receiver.id);
         if (exitsRequest) throw new FriendRequestException();
 
-        const exitsFriend = await this.requestIsAccepted(sender.id, receiver.id);
+        const exitsFriend = await this.friendRepository.findOne({
+            where: [
+                {
+                    sender: sender.id,
+                    receiver: receiver.id,
+                },
+                {
+                    sender: receiver.id,
+                    receiver: sender.id,
+                },
+            ],
+        });
         if (exitsFriend) throw new FriendRequestException();
 
         const friend = this.friendRequestRepository.create({

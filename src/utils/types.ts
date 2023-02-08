@@ -205,3 +205,8 @@ export type FriendRequestAcceptedPayload = {
     friend: Friend;
     friendRequest: FriendRequest;
 };
+
+export type RemoveFriendEventPayload = {
+    friend: Friend;
+    userId: number;
+};

@@ -39,6 +39,14 @@ export class FriendsService implements IFriendService {
                         id: friendId,
                     },
                 },
+                {
+                    sender: {
+                        id: friendId,
+                    },
+                    receiver: {
+                        id: userId,
+                    },
+                },
             ],
             relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
@@ -50,13 +58,9 @@ export class FriendsService implements IFriendService {
         if (!user) throw new UserNotFoundException();
         const friend = await this.getFriend({ userId, friendId: removeUserId });
         if (!friend) throw new FriendNotFoundException();
-        return this.friendRepository.delete({
-            sender: {
-                id: userId,
-            },
-            receiver: {
-                id: removeUserId,
-            },
+        await this.friendRepository.delete({
+            id: friend.id,
         });
+        return friend;
     }
 }
