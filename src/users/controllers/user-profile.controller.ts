@@ -7,6 +7,7 @@ import {
     MaxFileSizeValidator,
     Param,
     ParseFilePipe,
+    ParseIntPipe,
     Post,
     UploadedFile,
     UseInterceptors,
@@ -26,6 +27,11 @@ export class UserProfileController {
     @Get()
     getProfile(@AuthUser() user: User) {
         return this.userProfileService.getProfile(user);
+    }
+
+    @Get(':id')
+    getProfileById(@Param('id', ParseIntPipe) id: number) {
+        return this.userProfileService.getProfileById(id);
     }
 
     @UseInterceptors(FileInterceptor('banner'))

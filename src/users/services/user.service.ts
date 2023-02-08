@@ -21,7 +21,7 @@ export class UserService implements IUserService {
     }
 
     async findUser(findUserParams: FindUserParams, options?: FindUserSelectOption): Promise<User> {
-        const selections: (keyof User)[] = ['email', 'firstName', 'lastName', 'id'];
+        const selections: (keyof User)[] = ['email', 'firstName', 'lastName', 'id', 'profile'];
         const selectionsWithPassword: (keyof User)[] = [...selections, 'password'];
         const selectedKey = options?.selectAll ? selectionsWithPassword : selections;
         return this.userRepository.findOne(findUserParams, {

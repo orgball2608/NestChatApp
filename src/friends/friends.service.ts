@@ -24,7 +24,7 @@ export class FriendsService implements IFriendService {
                     receiver: user,
                 },
             ],
-            relations: ['sender', 'receiver'],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
     }
 
@@ -40,6 +40,7 @@ export class FriendsService implements IFriendService {
                     },
                 },
             ],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
     }
 

@@ -16,7 +16,7 @@ export class MessagesService implements IMessageService {
     async createMessage({ user, content, conversationId }: CreateMessageParams) {
         const conversation = await this.conversationRepository.findOne({
             where: { id: conversationId },
-            relations: ['creator', 'recipient', 'lastMessageSent'],
+            relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
         });
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
@@ -38,7 +38,7 @@ export class MessagesService implements IMessageService {
 
     getMessagesByConversationId(conversationId: number): Promise<Message[]> {
         return this.messageRepository.find({
-            relations: ['author'],
+            relations: ['author', 'author.profile'],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
         });

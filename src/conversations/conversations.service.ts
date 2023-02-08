@@ -22,7 +22,9 @@ export class ConversationsService implements IConversationsService {
             .createQueryBuilder('conversation')
             .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
             .leftJoinAndSelect('conversation.creator', 'creator')
+            .leftJoinAndSelect('creator.profile', 'creatorProfile')
             .leftJoinAndSelect('conversation.recipient', 'recipient')
+            .leftJoinAndSelect('recipient.profile', 'recipientProfile')
             .where('creator.id = :id', { id })
             .orWhere('recipient.id = :id', { id })
             .orderBy('conversation.lastMessageSentAt', 'DESC')
@@ -34,7 +36,7 @@ export class ConversationsService implements IConversationsService {
             where: {
                 id,
             },
-            relations: ['lastMessageSent', 'creator', 'recipient'],
+            relations: ['lastMessageSent', 'creator', 'recipient', 'creator.profile', 'recipient.profile'],
         });
     }
 

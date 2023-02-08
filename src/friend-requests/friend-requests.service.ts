@@ -61,6 +61,7 @@ export class FriendRequestsService implements IFriendRequestService {
                     status: 'pending',
                 },
             ],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
     }
 
@@ -78,13 +79,14 @@ export class FriendRequestsService implements IFriendRequestService {
                     status: 'accepted',
                 },
             ],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
     }
 
     async getRequestById(id: number) {
         const request = await this.friendRequestRepository.findOne({
             where: { id },
-            relations: ['sender', 'receiver'],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
         if (!request) throw new FriendRequestNotFoundException();
         return request;
@@ -138,7 +140,7 @@ export class FriendRequestsService implements IFriendRequestService {
                     id: userId,
                 },
             },
-            relations: ['sender', 'receiver'],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
     }
 
@@ -150,7 +152,7 @@ export class FriendRequestsService implements IFriendRequestService {
                     id: userId,
                 },
             },
-            relations: ['sender', 'receiver'],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
     }
 }

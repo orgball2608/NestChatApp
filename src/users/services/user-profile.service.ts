@@ -5,6 +5,7 @@ import { generateUUIDV4 } from 'src/utils/helpers';
 import { Profile } from 'src/utils/typeorm';
 import { UpdateProfileParams } from 'src/utils/types';
 import { Repository } from 'typeorm';
+import { UserNotFoundException } from '../exceptions/UserNotFound';
 import { IUserService } from '../interfaces/user';
 import { IUserProfileService } from '../interfaces/user-profile';
 
@@ -100,6 +101,13 @@ export class UserProfileService implements IUserProfileService {
         user.profile = await this.createProfile();
         user.profile.location = location;
         await this.profileRepository.save(user.profile);
+        return this.userService.saveUser(user);
+    }
+
+    async getProfileById(id: number) {
+        const user = await this.userService.findUser({ id });
+        if (!user) throw new UserNotFoundException();
+        if (!user.profile) user.profile = await this.createProfile();
         return this.userService.saveUser(user);
     }
 }

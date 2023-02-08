@@ -21,12 +21,15 @@ import {
 } from '../utils/types';
 import { Conversation, GroupMessage } from '../utils/typeorm';
 import { IGroupService } from '../groups/interfaces/groups';
+import { IFriendService } from 'src/friends/friends';
 
 @WebSocketGateway({
     cors: {
         origin: ['http://localhost:3000'],
         credentials: true,
     },
+    pingInterval: 10000,
+    pingTimeout: 15000,
 })
 export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
@@ -36,6 +39,8 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         private readonly conversationService,
         @Inject(Services.GROUPS)
         private readonly groupService: IGroupService,
+        @Inject(Services.FRIENDS)
+        private readonly friendsService: IFriendService,
     ) {}
 
     handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
@@ -238,5 +243,23 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     handleLeaveGroup(payload) {
         const { id } = payload;
         this.server.to(`group-${id}`).emit('onGroupLeave', payload);
+    }
+
+    @SubscribeMessage('getOnlineFriends')
+    async handleGetOnlineFriends(@MessageBody() data: any, @ConnectedSocket() socket: AuthenticatedSocket) {
+        console.log('handleGetOnlineFriends');
+        const { user } = socket;
+        if (user) {
+            const friends = await this.friendsService.getFriends(user);
+            if (!friends) return;
+            const onlineFriends = [];
+            const offlineFriends = [];
+            for (let i = 0; i < friends.length; i++) {
+                const friend = friends[i].receiver.id === user.id ? friends[i].sender : friends[i].receiver;
+                const socket = this.sessions.getUserSocket(friend.id);
+                socket ? onlineFriends.push(friend) : offlineFriends.push(friend);
+            }
+            socket.emit('getStatusFriends', { onlineFriends, offlineFriends });
+        }
     }
 }
