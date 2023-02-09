@@ -11,9 +11,10 @@ import { GroupRecipientsService } from './services/group-recipients.service';
 import { GroupRecipientsController } from './controllers/group-recipients.controller';
 import { GroupMiddleware } from './middlewares/group.middleware';
 import { isAuthorized } from 'src/utils/helpers';
+import { StorageModule } from 'src/storage/storage.module';
 
 @Module({
-    imports: [UsersModule, TypeOrmModule.forFeature([Group, GroupMessage, User])],
+    imports: [UsersModule, TypeOrmModule.forFeature([Group, GroupMessage, User]), StorageModule],
     controllers: [GroupsController, GroupMessagesController, GroupRecipientsController],
     providers: [
         {

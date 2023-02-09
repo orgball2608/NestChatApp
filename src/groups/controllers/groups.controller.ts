@@ -1,4 +1,18 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    FileTypeValidator,
+    Get,
+    Inject,
+    MaxFileSizeValidator,
+    Param,
+    ParseFilePipe,
+    ParseIntPipe,
+    Patch,
+    Post,
+    UploadedFile,
+    UseInterceptors,
+} from '@nestjs/common';
 import { Routes, Services } from '../../utils/constants';
 import { IGroupService } from '../interfaces/groups';
 import { AuthUser } from '../../utils/decorator';
@@ -7,6 +21,7 @@ import { CreateGroupDto } from '../dtos/CreateGroup.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EditGroupTitleDto } from '../dtos/EditGroupTitle.dto';
 import { TransferOwnerDto } from '../dtos/TransferOwner.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller(Routes.GROUPS)
 export class GroupsController {
@@ -66,6 +81,30 @@ export class GroupsController {
             newOwnerId,
         });
         this.eventEmitter.emit('group.owner.change', response);
+        return response;
+    }
+
+    @Patch(':id/avatar')
+    @UseInterceptors(FileInterceptor('avatar'))
+    async updateGroupAvatar(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) id: number,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }),
+                    new MaxFileSizeValidator({ maxSize: 5242880 }),
+                ],
+            }),
+        )
+        avatar,
+    ) {
+        const response = await this.groupServices.updateGroupAvatar({
+            groupId: id,
+            userId: user.id,
+            avatar,
+        });
+        this.eventEmitter.emit('group.avatar.update', response);
         return response;
     }
 }

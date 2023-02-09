@@ -10,6 +10,7 @@ import {
     EditGroupTitleParams,
     GetGroupsByIdParams,
     GetGroupsParams,
+    UpdateGroupAvatarParams,
 } from '../../utils/types';
 import { Services } from '../../utils/constants';
 import { IUserService } from '../../users/interfaces/user';
@@ -17,12 +18,14 @@ import { GroupNotFoundException } from '../exceptions/GroupNotFoundException';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwnerException';
 import { UserNotFoundException } from '../exceptions/UserNotFound';
 import { GroupOwnerTransferException } from '../exceptions/GroupOwnerTransfer';
+import { generateUUIDV4 } from 'src/utils/helpers';
 
 @Injectable()
 export class GroupsService implements IGroupService {
     constructor(
         @InjectRepository(Group) private readonly groupRepository: Repository<Group>,
         @Inject(Services.USERS) private readonly userService: IUserService,
+        @Inject(Services.IMAGE_UPLOAD_SERVICE) private readonly imageUploadService,
     ) {}
     async createGroup(params: CreateGroupParams) {
         const { title, creator } = params;
@@ -50,7 +53,15 @@ export class GroupsService implements IGroupService {
             where: {
                 id,
             },
-            relations: ['creator', 'users', 'lastMessageSent', 'owner'],
+            relations: [
+                'creator',
+                'users',
+                'lastMessageSent',
+                'owner',
+                'creator.profile',
+                'owner.profile',
+                'users.profile',
+            ],
         });
         if (!group) throw new GroupNotFoundException();
         // const checkUser = group.users.find((user) => user.id === userId);
@@ -118,5 +129,19 @@ export class GroupsService implements IGroupService {
         if (!newOwner) throw new UserNotFoundException();
         group.owner = newOwner;
         return await this.groupRepository.save(group);
+    }
+
+    async updateGroupAvatar(params: UpdateGroupAvatarParams) {
+        const { groupId, userId, avatar } = params;
+        const group = await this.getGroupById({ id: groupId, userId });
+        if (!group) throw new GroupNotFoundException();
+        const key = generateUUIDV4();
+        const avatarUrl = await this.imageUploadService.uploadFile({
+            key,
+            file: avatar,
+        });
+        group.avatar = avatarUrl;
+        const savedGroup = await this.groupRepository.save(group);
+        return savedGroup;
     }
 }

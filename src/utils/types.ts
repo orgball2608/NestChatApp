@@ -211,3 +211,9 @@ export type RemoveFriendEventPayload = {
     friend: Friend;
     userId: number;
 };
+
+export type UpdateGroupAvatarParams = {
+    groupId: number;
+    userId: number;
+    avatar: Express.Multer.File;
+};

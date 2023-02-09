@@ -6,6 +6,7 @@ import {
     FindUserSelectOption,
     GetGroupsByIdParams,
     GetGroupsParams,
+    UpdateGroupAvatarParams,
 } from '../../utils/types';
 import { Group, User } from '../../utils/typeorm';
 
@@ -18,4 +19,5 @@ export interface IGroupService {
     hasAccess({ id, userId }: AccessParams): Promise<User>;
     updateOwner();
     changeOwner(params: changeOwnerParams): Promise<Group>;
+    updateGroupAvatar(params: UpdateGroupAvatarParams): Promise<Group>;
 }
