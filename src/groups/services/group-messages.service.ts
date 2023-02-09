@@ -76,9 +76,23 @@ export class GroupMessagesService implements IGroupMessageService {
             },
         });
 
+        const messages = await this.groupMessageRepository.find({
+            where: {
+                group: {
+                    id: groupId,
+                },
+            },
+            order: {
+                createdAt: 'DESC',
+            },
+        });
+
         if (!message) throw new HttpException('Cannot delete message', HttpStatus.BAD_REQUEST);
 
-        if (group.lastMessageSent.id !== message.id) return this.groupMessageRepository.delete({ id: messageId });
+        if (group.lastMessageSent.id !== message.id) {
+            await this.groupMessageRepository.delete({ id: messageId });
+            return messages;
+        }
 
         const size = group.messages.length;
         const SECOND_GROUP_MESSAGE_INDEX = 1;
@@ -92,7 +106,8 @@ export class GroupMessagesService implements IGroupMessageService {
                     lastMessageSent: null,
                 },
             );
-            return this.groupMessageRepository.delete({ id: messageId });
+            await this.groupMessageRepository.delete({ id: messageId });
+            return messages;
         } else {
             console.log('There are more than 1 message');
             const newLastMessage = group.messages[SECOND_GROUP_MESSAGE_INDEX];
@@ -104,7 +119,8 @@ export class GroupMessagesService implements IGroupMessageService {
                     lastMessageSent: newLastMessage,
                 },
             );
-            return this.groupMessageRepository.delete({ id: messageId });
+            await this.groupMessageRepository.delete({ id: messageId });
+            return messages;
         }
     }
 

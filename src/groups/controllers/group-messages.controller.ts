@@ -43,18 +43,18 @@ export class GroupMessagesController {
         @Param('id', ParseIntPipe) groupId: number,
         @Param('messageId', ParseIntPipe) messageId: number,
     ) {
-        this.groupMessageService.deleteGroupMessage({
+        const messages = await this.groupMessageService.deleteGroupMessage({
             userId: user.id,
             groupId,
             messageId,
         });
-
         this.eventEmitter.emit('group.message.delete', {
             userId: user.id,
             messageId,
             groupId,
+            messages,
         });
-        return { groupId, messageId };
+        return { groupId, messageId, messages };
     }
 
     @Patch(':messageId')

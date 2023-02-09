@@ -119,14 +119,18 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     async handleMessageDeleteEvent(payload: DeleteMessageParams) {
         console.log('Inside message.delete');
         const { conversationId } = payload;
-        const conversation = await this.conversationService.findConversationById({ conversationId });
+        const conversation = await this.conversationService.findConversationById(conversationId);
         if (!conversation) return;
         const { creator, recipient } = conversation;
         const recipientSocket =
             creator.id === payload.userId
                 ? this.sessions.getUserSocket(recipient.id)
                 : this.sessions.getUserSocket(creator.id);
-        if (recipientSocket) recipientSocket.emit('onMessageDelete', payload);
+        if (recipientSocket)
+            recipientSocket.emit('onMessageDelete', {
+                ...payload,
+                conversation,
+            });
     }
 
     @OnEvent('message.edit')
