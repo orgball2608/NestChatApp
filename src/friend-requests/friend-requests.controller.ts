@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Inject, Param, Post } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Routes, ServerEvents, Services, WebsocketEvents } from 'src/utils/constants';
+import { Routes, ServerEvents, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
 import { User } from 'src/utils/typeorm';
 import { CreateFriendRequestDto } from './dtos/CreateFriendRequest.dto';
@@ -40,8 +40,11 @@ export class FriendRequestsController {
     @Post(':id/accept')
     async acceptFriendRequest(@AuthUser() user: User, @Param('id') id: number) {
         const response = await this.friendRequestsService.acceptRequest({ userId: user.id, id });
-        this.event.emit(ServerEvents.FRIEND_REQUEST_ACCEPTED, response);
-        return response;
+        this.event.emit(ServerEvents.FRIEND_REQUEST_ACCEPTED, { ...response, user });
+        return {
+            ...response,
+            user,
+        };
     }
 
     @Delete(':id/cancel')

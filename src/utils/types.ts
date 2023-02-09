@@ -204,6 +204,7 @@ export type UpdateProfileParams = Partial<{
 export type FriendRequestAcceptedPayload = {
     friend: Friend;
     friendRequest: FriendRequest;
+    user: User;
 };
 
 export type RemoveFriendEventPayload = {
