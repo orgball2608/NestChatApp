@@ -43,4 +43,8 @@ export class UserService implements IUserService {
             .select(['user.firstName', 'user.lastName', 'user.email', 'user.id'])
             .getMany();
     }
+
+    getUserById(id: string): Promise<User> {
+        return this.userRepository.findOne(id);
+    }
 }

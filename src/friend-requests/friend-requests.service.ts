@@ -166,4 +166,22 @@ export class FriendRequestsService implements IFriendRequestService {
             relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
         });
     }
+
+    getRequestByUserId(userOneId: number, userTwoId: number): Promise<FriendRequest> {
+        return this.friendRequestRepository.findOne({
+            where: [
+                {
+                    sender: userOneId,
+                    receiver: userTwoId,
+                    status: 'pending',
+                },
+                {
+                    sender: userTwoId,
+                    receiver: userOneId,
+                    status: 'pending',
+                },
+            ],
+            relations: ['sender', 'receiver', 'sender.profile', 'receiver.profile'],
+        });
+    }
 }

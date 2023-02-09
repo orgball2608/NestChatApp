@@ -60,4 +60,9 @@ export class FriendRequestsController {
         this.event.emit(ServerEvents.FRIEND_REQUEST_REJECTED, response);
         return response;
     }
+
+    @Get('user/:id')
+    async getFriendRequestsByUserId(@AuthUser() user: User, @Param('id') userId: number) {
+        return await this.friendRequestsService.getRequestByUserId(user.id, userId);
+    }
 }
