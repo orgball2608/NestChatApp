@@ -276,4 +276,11 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const friendSocket = this.sessions.getUserSocket(sender.id === userId ? receiver.id : sender.id);
         friendSocket && friendSocket.emit('onFriendRemoved', payload);
     }
+
+    @OnEvent('group.avatar.update')
+    updateGroupAvatar(payload) {
+        console.log('inside group.avatar.update');
+        const group = payload;
+        this.server.to(`group-${group.id}`).emit('onGroupUpdateAvatar', payload);
+    }
 }
