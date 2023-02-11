@@ -36,8 +36,8 @@ export class GroupsService implements IGroupService {
         return this.groupRepository.save(group);
     }
 
-    async getGroups(params: GetGroupsParams) {
-        return await this.groupRepository
+    getGroups(params: GetGroupsParams) {
+        return this.groupRepository
             .createQueryBuilder('group')
             .leftJoinAndSelect('group.users', 'user')
             .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
@@ -82,7 +82,7 @@ export class GroupsService implements IGroupService {
             where: {
                 id: groupId,
             },
-            relations: ['creator', 'users', 'lastMessageSent'],
+            relations: ['creator', 'users', 'lastMessageSent', 'owner', 'creator.profile', 'owner.profile'],
         });
         if (!group) return;
         const checkUser = group.users.find((user) => user.id === userId);

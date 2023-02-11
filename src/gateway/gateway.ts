@@ -15,6 +15,7 @@ import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
 import {
     ActionGroupRecipientResponse,
+    AddGroupRecipientsResponse,
     CreateGroupMessageResponse,
     CreateMessageResponse,
     DeleteMessageParams,
@@ -220,6 +221,21 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         console.log('inside group.user.add');
         const recipientSocket = this.sessions.getUserSocket(payload.user.id);
         recipientSocket && recipientSocket.emit('onGroupUserAdd', payload);
+        this.server.to(`group-${id}`).emit('onGroupReceivedNewUser', payload);
+    }
+
+    @OnEvent('group.recipients.add.many')
+    handleGroupRecipientsAdd(payload: AddGroupRecipientsResponse) {
+        console.log('inside group.recipients.add.many');
+        const {
+            group: { id },
+            users,
+        } = payload;
+
+        users.forEach((user) => {
+            const recipientSocket = this.sessions.getUserSocket(user.id);
+            recipientSocket && recipientSocket.emit('onGroupUserAdd', payload);
+        });
         this.server.to(`group-${id}`).emit('onGroupReceivedNewUser', payload);
     }
 
