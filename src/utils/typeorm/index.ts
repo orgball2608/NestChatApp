@@ -7,9 +7,21 @@ import { GroupMessage } from './entities/GroupMessage';
 import { Friend } from './entities/Friend';
 import { FriendRequest } from './entities/FriendRequest';
 import { Profile } from './entities/Profile';
+import { Attachment } from './entities/Attachment';
 
-const entities = [User, Session, Conversation, Message, Group, GroupMessage, Friend, FriendRequest, Profile];
+const entities = [
+    User,
+    Session,
+    Conversation,
+    Message,
+    Group,
+    GroupMessage,
+    Friend,
+    FriendRequest,
+    Profile,
+    Attachment,
+];
 
 export default entities;
 
-export { User, Session, Conversation, Message, Group, GroupMessage, Friend, FriendRequest, Profile };
+export { User, Session, Conversation, Message, Group, GroupMessage, Friend, FriendRequest, Profile, Attachment };

@@ -25,6 +25,7 @@ export enum Services {
     FRIENDS = 'FRIENDS_SERVICE',
     FRIEND_REQUESTS = 'FRIEND_REQUESTS_SERVICE',
     USER_PROFILE = 'USER_PROFILE_SERVICE',
+    ATTACHMENTS = 'ATTACHMENTS_SERVICE',
 }
 
 export enum WebsocketEvents {

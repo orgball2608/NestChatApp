@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import * as sharp from 'sharp';
-import { Attachment, AuthenticatedRequest } from './types';
+import { AttachmentFile, AuthenticatedRequest } from './types';
 import { NextFunction } from 'express';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
@@ -16,7 +16,7 @@ export async function compareHash(rawPassword: string, hashedPassword: string) {
 
 export const generateUUIDV4 = () => uuidv4();
 
-export const compressImage = (attachment: Attachment) => sharp(attachment.buffer).resize(300).jpeg().toBuffer();
+export const compressImage = (attachment: AttachmentFile) => sharp(attachment.buffer).resize(300).jpeg().toBuffer();
 
 export function isAuthorized(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     if (req.user) next();

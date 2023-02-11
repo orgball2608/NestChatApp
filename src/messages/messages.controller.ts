@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Inject,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
 import { Routes, Services } from '../utils/constants';
 import { IMessageService } from './messages';
 import { AuthUser } from '../utils/decorator';
@@ -6,6 +18,9 @@ import { User } from '../utils/typeorm';
 import { CreateMessageDto } from './dtos/CreateMessage.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EditMessageDto } from './dtos/EditMessage.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { AttachmentFile } from 'src/utils/types';
+import { EmptyMessageException } from './exceptions/EmptyMessage';
 
 @Controller(Routes.MESSAGES)
 export class MessagesController {
@@ -13,16 +28,28 @@ export class MessagesController {
         @Inject(Services.MESSAGES) private readonly messageService: IMessageService,
         private eventEmitter: EventEmitter2,
     ) {}
+
     @Post()
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            {
+                name: 'attachments',
+                maxCount: 5,
+            },
+        ]),
+    )
     async createMessage(
         @AuthUser() user: User,
-        @Param('id', ParseIntPipe) conversationId: number,
+        @UploadedFiles() { attachments }: { attachments: AttachmentFile[] },
+        @Param('id', ParseIntPipe)
+        conversationId: number,
         @Body() { content }: CreateMessageDto,
     ) {
-        const params = { user, conversationId, content };
+        if (!attachments && !content) throw new EmptyMessageException();
+        const params = { user, conversationId, content, attachments };
         const response = await this.messageService.createMessage(params);
         this.eventEmitter.emit('message.create', response);
-        return;
+        return response;
     }
 
     @Get()

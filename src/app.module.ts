@@ -13,6 +13,7 @@ import { GroupsModule } from './groups/groups.module';
 import { StorageModule } from './storage/storage.module';
 import { FriendsModule } from './friends/friends.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
+import { AttachmentsModule } from './attachments/attachments.module';
 
 @Module({
     imports: [
@@ -42,6 +43,7 @@ import { FriendRequestsModule } from './friend-requests/friend-requests.module';
         StorageModule,
         FriendsModule,
         FriendRequestsModule,
+        AttachmentsModule,
     ],
     controllers: [],
     providers: [],

@@ -5,7 +5,7 @@ export abstract class BaseMessage {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('text')
+    @Column('text', { nullable: true })
     content: string;
 
     @CreateDateColumn({ name: 'created_at' })

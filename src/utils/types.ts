@@ -1,4 +1,4 @@
-import { Conversation, Friend, FriendRequest, Group, GroupMessage, Message, User } from './typeorm';
+import { Attachment, Conversation, Friend, FriendRequest, Group, GroupMessage, Message, User } from './typeorm';
 import { Request } from 'express';
 
 export type CreateUserDetails = {
@@ -28,7 +28,8 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export type CreateMessageParams = {
-    content: string;
+    content?: string;
+    attachments?: AttachmentFile[];
     conversationId: number;
     user: User;
 };
@@ -149,9 +150,6 @@ export type UploadImageParams = {
     file: Express.Multer.File;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Attachment extends Express.Multer.File {}
-
 export type AccessParams = {
     id: number;
     userId: number;
@@ -227,4 +225,12 @@ export type UpdateGroupAvatarParams = {
     groupId: number;
     userId: number;
     avatar: Express.Multer.File;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AttachmentFile extends Express.Multer.File {}
+
+export type uploadAttachmentParams = {
+    file: AttachmentFile;
+    attachment: Attachment;
 };
