@@ -5,6 +5,7 @@ import { AuthUser } from '../../utils/decorator';
 import { User } from '../../utils/typeorm';
 import { AddGroupRecipientDto } from '../dtos/AddGroupRecipient.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AddGroupRecipientsParams } from 'src/utils/types';
 
 @Controller(Routes.GROUP_RECIPIENTS)
 export class GroupRecipientsController {
@@ -24,6 +25,21 @@ export class GroupRecipientsController {
             email,
         });
         this.eventEmitter.emit('group.recipients.add', response);
+        return response;
+    }
+
+    @Post('recipients')
+    async addGroupRecipients(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) groupId: number,
+        @Body() { emails }: AddGroupRecipientsParams,
+    ) {
+        const response = await this.groupRecipientService.addGroupRecipients({
+            userId: user.id,
+            groupId,
+            emails,
+        });
+        this.eventEmitter.emit('group.recipients.add.many', response);
         return response;
     }
 

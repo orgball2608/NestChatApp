@@ -110,6 +110,12 @@ export type AddGroupRecipientParams = {
     userId: number;
 };
 
+export type AddGroupRecipientsParams = {
+    groupId: number;
+    emails: string[];
+    userId: number;
+};
+
 export type RemoveGroupRecipientParams = {
     groupId: number;
     removeUserId: number;
@@ -119,6 +125,11 @@ export type RemoveGroupRecipientParams = {
 export type ActionGroupRecipientResponse = {
     group: Group;
     user: User;
+};
+
+export type AddGroupRecipientsResponse = {
+    group: Group;
+    users: User[];
 };
 
 export type AddGroupUserResponse = {

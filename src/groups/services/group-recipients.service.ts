@@ -1,6 +1,12 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IGroupRecipientService } from '../interfaces/group-recipients';
-import { AddGroupRecipientParams, CheckUserInGroupParams, RemoveGroupRecipientParams } from '../../utils/types';
+import {
+    AddGroupRecipientParams,
+    AddGroupRecipientsParams,
+    AddGroupRecipientsResponse,
+    CheckUserInGroupParams,
+    RemoveGroupRecipientParams,
+} from '../../utils/types';
 import { IGroupService } from '../interfaces/groups';
 import { IUserService } from '../../users/interfaces/user';
 import { Services } from '../../utils/constants';
@@ -27,6 +33,23 @@ export class GroupRecipientsService implements IGroupRecipientService {
         group.users = [...group.users, recipient];
         const savedGroup = await this.groupService.saveGroup(group);
         return { group: savedGroup, user: recipient };
+    }
+
+    async addGroupRecipients(params: AddGroupRecipientsParams): Promise<AddGroupRecipientsResponse> {
+        const { groupId, userId, emails } = params;
+        const group = await this.groupService.getGroupById({ id: groupId, userId });
+        if (!group) throw new GroupNotFoundException();
+        const usersPromise = emails.map((email) => this.userService.findUser({ email }, { selectAll: false }));
+        const users = (await Promise.all(usersPromise)).filter((user) => user);
+        if (users.length === 0) throw new HttpException('Cannot Find User to Add', HttpStatus.BAD_REQUEST);
+        group.users.map((user) => {
+            const userInGroup = users.find((userToAdd) => userToAdd.id === user.id);
+            if (userInGroup) throw new HttpException('User already in group', HttpStatus.BAD_REQUEST);
+        });
+        if (group.owner.id !== userId) throw new NotGroupOwnerException();
+        group.users = [...group.users, ...users];
+        const savedGroup = await this.groupService.saveGroup(group);
+        return { group: savedGroup, users: users };
     }
 
     async removeGroupRecipient(params: RemoveGroupRecipientParams) {

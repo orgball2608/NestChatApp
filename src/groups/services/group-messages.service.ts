@@ -44,7 +44,7 @@ export class GroupMessagesService implements IGroupMessageService {
         if (!existUser) throw new HttpException('User not in Group !Cant get Messages', HttpStatus.BAD_REQUEST);
         return await this.groupMessageRepository.find({
             where: { group: { id } },
-            relations: ['author'],
+            relations: ['author', 'author.profile'],
             order: {
                 createdAt: 'DESC',
             },
@@ -59,6 +59,7 @@ export class GroupMessagesService implements IGroupMessageService {
             .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
             .leftJoinAndSelect('group.messages', 'message')
             .leftJoinAndSelect('group.owner', 'owner')
+            .leftJoinAndSelect('owner.profile', 'ownerProfile')
             .where('group.id = :groupId', {
                 conversationId: groupId,
             })
@@ -136,7 +137,7 @@ export class GroupMessagesService implements IGroupMessageService {
                     id: groupId,
                 },
             },
-            relations: ['group', 'group.creator', 'group.users', 'author'],
+            relations: ['group', 'group.creator', 'group.users', 'author', 'author.profile', 'group.creator.profile'],
         });
 
         if (!messageDB) throw new HttpException('Cannot Edit Group Message', HttpStatus.BAD_REQUEST);

@@ -35,12 +35,15 @@ export class UserService implements IUserService {
     }
 
     searchUsers(query: string): Promise<User[]> {
-        const statement = '(user.email LIKE :query)';
+        const statement = '(user.firstName LIKE :query)';
+        const statement2 = '(user.lastName LIKE :query)';
         return this.userRepository
             .createQueryBuilder('user')
             .where(statement, { query: `%${query}%` })
+            .orWhere(statement2, { query: `%${query}%` })
             .limit(10)
-            .select(['user.firstName', 'user.lastName', 'user.email', 'user.id'])
+            .select(['user.firstName', 'user.lastName', 'user.email', 'user.profile', 'user.id'])
+            .leftJoinAndSelect('user.profile', 'profile')
             .getMany();
     }
 

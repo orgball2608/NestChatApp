@@ -43,7 +43,11 @@ export class GroupsService implements IGroupService {
             .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
             .orderBy('lastMessageSent.createdAt', 'DESC')
             .leftJoinAndSelect('group.owner', 'owner')
+            .leftJoinAndSelect('group.creator', 'creator')
+            .leftJoinAndSelect('owner.profile', 'ownerProfile')
+            .leftJoinAndSelect('creator.profile', 'creatorProfile')
             .leftJoinAndSelect('group.users', 'users')
+            .leftJoinAndSelect('users.profile', 'usersProfile')
             .where('user.id = :userId', { userId: params.userId })
             .getMany();
     }
@@ -65,10 +69,8 @@ export class GroupsService implements IGroupService {
             ],
         });
         if (!group) throw new GroupNotFoundException();
-        // const checkUser = group.users.find((user) => user.id === userId);
-        // if (checkUser) return group;
-        // else console.log('User not found');
-        return group;
+        const checkUser = group.users.find((user) => user.id === userId);
+        if (checkUser) return group;
     }
     saveGroup(group: Group) {
         return this.groupRepository.save(group);
