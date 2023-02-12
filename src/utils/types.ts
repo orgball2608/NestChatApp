@@ -71,6 +71,7 @@ export type CreateGroupMessageParams = {
     groupId: number;
     content: string;
     author: User;
+    attachments?: AttachmentFile[];
 };
 
 export type CreateGroupMessageResponse = {

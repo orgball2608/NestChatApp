@@ -6,6 +6,8 @@ export class Attachment {
     @PrimaryGeneratedColumn('uuid')
     key: string;
 
-    @ManyToOne(() => Message, (message) => message.attachments)
+    @ManyToOne(() => Message, (message) => message.attachments, {
+        onDelete: 'CASCADE',
+    })
     message: Message;
 }

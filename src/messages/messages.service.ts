@@ -31,7 +31,7 @@ export class MessagesService implements IMessageService {
 
         const newAttachments = attachments ? await this.attachmentsService.create(attachments) : [];
 
-        const message = this.messageRepository.create({
+        const message = await this.messageRepository.create({
             content,
             conversation,
             author: instanceToPlain(user),

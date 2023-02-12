@@ -8,6 +8,7 @@ import { Friend } from './entities/Friend';
 import { FriendRequest } from './entities/FriendRequest';
 import { Profile } from './entities/Profile';
 import { Attachment } from './entities/Attachment';
+import { GroupAttachment } from './entities/GroupAttachments';
 
 const entities = [
     User,
@@ -20,8 +21,21 @@ const entities = [
     FriendRequest,
     Profile,
     Attachment,
+    GroupAttachment,
 ];
 
 export default entities;
 
-export { User, Session, Conversation, Message, Group, GroupMessage, Friend, FriendRequest, Profile, Attachment };
+export {
+    User,
+    Session,
+    Conversation,
+    Message,
+    Group,
+    GroupMessage,
+    Friend,
+    FriendRequest,
+    Profile,
+    Attachment,
+    GroupAttachment,
+};

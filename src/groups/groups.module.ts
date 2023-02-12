@@ -12,9 +12,10 @@ import { GroupRecipientsController } from './controllers/group-recipients.contro
 import { GroupMiddleware } from './middlewares/group.middleware';
 import { isAuthorized } from 'src/utils/helpers';
 import { StorageModule } from 'src/storage/storage.module';
+import { AttachmentsModule } from 'src/attachments/attachments.module';
 
 @Module({
-    imports: [UsersModule, TypeOrmModule.forFeature([Group, GroupMessage, User]), StorageModule],
+    imports: [UsersModule, TypeOrmModule.forFeature([Group, GroupMessage, User]), StorageModule, AttachmentsModule],
     controllers: [GroupsController, GroupMessagesController, GroupRecipientsController],
     providers: [
         {
