@@ -6,6 +6,7 @@ import { CreateUserDto } from './dtos/CreateUser.dto';
 import { IUserService } from '../users/interfaces/user';
 import { instanceToPlain } from 'class-transformer';
 import { AuthenticatedGuard, LocalAuthGuard } from './utils/Guards';
+import { AuthenticatedRequest } from 'src/utils/types';
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -33,5 +34,10 @@ export class AuthController {
     }
 
     @Post('logout')
-    logout() {}
+    @UseGuards(AuthenticatedGuard)
+    logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
+        req.logout((err) => {
+            return err ? res.send(400) : res.send(200);
+        });
+    }
 }
