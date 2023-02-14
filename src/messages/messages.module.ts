@@ -14,6 +14,12 @@ import { AttachmentsModule } from 'src/attachments/attachments.module';
             useClass: MessagesService,
         },
     ],
+    exports: [
+        {
+            provide: Services.MESSAGES,
+            useClass: MessagesService,
+        },
+    ],
     controllers: [MessagesController],
 })
 export class MessagesModule {}

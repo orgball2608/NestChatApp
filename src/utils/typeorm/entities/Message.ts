@@ -1,8 +1,9 @@
-import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { Conversation } from './Conversation';
 
 import { BaseMessage } from './BaseMessage';
 import { Attachment } from './Attachment';
+import { ReactMessage } from './ReactMessage';
 
 @Entity({ name: 'messages' })
 export class Message extends BaseMessage {
@@ -12,4 +13,8 @@ export class Message extends BaseMessage {
     @OneToMany(() => Attachment, (attachment) => attachment.message)
     @JoinColumn()
     attachments: Attachment[];
+
+    @OneToMany(() => ReactMessage, (react) => react.message)
+    @JoinColumn()
+    reacts: ReactMessage[];
 }

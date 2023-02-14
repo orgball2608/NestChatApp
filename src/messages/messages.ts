@@ -6,7 +6,10 @@ export interface IMessageService {
 
     getMessagesByConversationId(conversationId: number): Promise<Message[]>;
 
+    getMessageById(messageId: number): Promise<Message>;
+
     deleteMessage(params: DeleteMessageParams);
 
     editMessage(params: EditMessageParams): Promise<Message>;
+    save(message: Message): Promise<Message>;
 }

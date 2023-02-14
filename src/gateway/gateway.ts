@@ -18,6 +18,8 @@ import {
     AddGroupRecipientsResponse,
     CreateGroupMessageResponse,
     CreateMessageResponse,
+    CreateReactMessageParams,
+    CreateReactMessagePayload,
     DeleteMessageParams,
     RemoveFriendEventPayload,
 } from '../utils/types';
@@ -298,5 +300,26 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         console.log('inside group.avatar.update');
         const group = payload;
         this.server.to(`group-${group.id}`).emit('onGroupUpdateAvatar', payload);
+    }
+
+    @OnEvent('messages.reaction')
+    async messageReaction(payload: CreateReactMessagePayload) {
+        console.log('inside messages.reaction');
+        const { conversationId, message } = payload;
+        const conversation = await this.conversationService.findConversationById(conversationId);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket = this.sessions.getUserSocket(recipient.id);
+        const creatorSocket = this.sessions.getUserSocket(creator.id);
+        if (recipientSocket)
+            recipientSocket.emit('onReactMessage', {
+                message,
+                conversation,
+            });
+        if (creatorSocket)
+            creatorSocket.emit('onReactMessage', {
+                message,
+                conversation,
+            });
     }
 }

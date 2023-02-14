@@ -31,7 +31,7 @@ export class MessagesService implements IMessageService {
 
         const newAttachments = attachments ? await this.attachmentsService.create(attachments) : [];
 
-        const message = await this.messageRepository.create({
+        const message = this.messageRepository.create({
             content,
             conversation,
             author: instanceToPlain(user),
@@ -45,7 +45,7 @@ export class MessagesService implements IMessageService {
 
     getMessagesByConversationId(conversationId: number): Promise<Message[]> {
         return this.messageRepository.find({
-            relations: ['author', 'author.profile', 'attachments'],
+            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
         });
@@ -116,6 +116,17 @@ export class MessagesService implements IMessageService {
         });
         if (!message) throw new HttpException('Cannot Edit Message', HttpStatus.BAD_REQUEST);
         message.content = params.content;
+        return this.messageRepository.save(message);
+    }
+
+    getMessageById(messageId: number): Promise<Message> {
+        return this.messageRepository.findOne({
+            where: { id: messageId },
+            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
+        });
+    }
+
+    save(message: Message): Promise<Message> {
         return this.messageRepository.save(message);
     }
 }

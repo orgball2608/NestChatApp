@@ -235,3 +235,17 @@ export type uploadAttachmentParams = {
     file: AttachmentFile;
     attachment: Attachment;
 };
+
+export type ReactionType = 'like' | 'love' | 'care' | 'haha' | 'wow' | 'sad' | 'angry';
+
+export type CreateReactMessageParams = {
+    messageId: number;
+    conversationId: number;
+    user: User;
+    type: ReactionType;
+};
+
+export type CreateReactMessagePayload = {
+    message: Message;
+    conversationId: number;
+};

@@ -9,6 +9,7 @@ export enum Routes {
     FRIENDS = 'friends',
     FRIEND_REQUESTS = 'friend-requests',
     USER_PROFILE = 'user-profile',
+    REACTS = 'conversations/:id/messages/:messageId/reacts',
 }
 
 export enum Services {
@@ -26,6 +27,7 @@ export enum Services {
     FRIEND_REQUESTS = 'FRIEND_REQUESTS_SERVICE',
     USER_PROFILE = 'USER_PROFILE_SERVICE',
     ATTACHMENTS = 'ATTACHMENTS_SERVICE',
+    REACTS = 'REACTS_SERVICE',
 }
 
 export enum WebsocketEvents {

@@ -14,6 +14,7 @@ import { StorageModule } from './storage/storage.module';
 import { FriendsModule } from './friends/friends.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 import { AttachmentsModule } from './attachments/attachments.module';
+import { ReactsModule } from './reacts/reacts.module';
 
 @Module({
     imports: [
@@ -44,6 +45,7 @@ import { AttachmentsModule } from './attachments/attachments.module';
         FriendsModule,
         FriendRequestsModule,
         AttachmentsModule,
+        ReactsModule,
     ],
     controllers: [],
     providers: [],
