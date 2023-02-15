@@ -10,6 +10,7 @@ import { Profile } from './entities/Profile';
 import { Attachment } from './entities/Attachment';
 import { GroupAttachment } from './entities/GroupAttachments';
 import { ReactMessage } from './entities/ReactMessage';
+import { ReactGroupMessage } from './entities/ReactGroupMessage';
 
 const entities = [
     User,
@@ -24,6 +25,7 @@ const entities = [
     Attachment,
     GroupAttachment,
     ReactMessage,
+    ReactGroupMessage,
 ];
 
 export default entities;
@@ -41,4 +43,5 @@ export {
     Attachment,
     GroupAttachment,
     ReactMessage,
+    ReactGroupMessage,
 };

@@ -249,3 +249,15 @@ export type CreateReactMessagePayload = {
     message: Message;
     conversationId: number;
 };
+
+export type CreateReactGroupMessageParams = {
+    messageId: number;
+    groupId: number;
+    user: User;
+    type: ReactionType;
+};
+
+export type CreateReactGroupMessagePayload = {
+    message: GroupMessage;
+    groupId: number;
+};

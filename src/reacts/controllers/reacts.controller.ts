@@ -3,8 +3,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
 import { User } from 'src/utils/typeorm';
-import { CreateReactDto } from './dtos/CreateReact.dto';
-import { IReactService } from './reacts';
+import { CreateReactDto } from '../dtos/CreateReact.dto';
+import { IReactService } from '../reacts';
 
 @Controller(Routes.REACTS)
 export class ReactsController {

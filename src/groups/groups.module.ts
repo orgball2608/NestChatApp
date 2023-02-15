@@ -36,6 +36,10 @@ import { AttachmentsModule } from 'src/attachments/attachments.module';
             provide: Services.GROUPS,
             useClass: GroupsService,
         },
+        {
+            provide: Services.GROUP_MESSAGES,
+            useClass: GroupMessagesService,
+        },
     ],
 })
 export class GroupsModule {

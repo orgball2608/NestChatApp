@@ -49,7 +49,7 @@ export class GroupMessagesService implements IGroupMessageService {
         if (!existUser) throw new HttpException('User not in Group !Cant get Messages', HttpStatus.BAD_REQUEST);
         return await this.groupMessageRepository.find({
             where: { group: { id } },
-            relations: ['author', 'author.profile', 'attachments'],
+            relations: ['author', 'author.profile', 'attachments', 'reacts'],
             order: {
                 createdAt: 'DESC',
             },
@@ -149,5 +149,16 @@ export class GroupMessagesService implements IGroupMessageService {
         messageDB.content = content;
 
         return this.groupMessageRepository.save(messageDB);
+    }
+
+    getGroupMessageById(id: number) {
+        return this.groupMessageRepository.findOne({
+            where: { id },
+            relations: ['author', 'author.profile', 'attachments', 'reacts'],
+        });
+    }
+
+    save(message: GroupMessage): Promise<GroupMessage> {
+        return this.groupMessageRepository.save(message);
     }
 }

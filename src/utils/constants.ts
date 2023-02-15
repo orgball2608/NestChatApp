@@ -10,6 +10,7 @@ export enum Routes {
     FRIEND_REQUESTS = 'friend-requests',
     USER_PROFILE = 'user-profile',
     REACTS = 'conversations/:id/messages/:messageId/reacts',
+    REACTS_GROUP_MESSAGE = 'groups/:id/messages/:messageId/reacts',
 }
 
 export enum Services {

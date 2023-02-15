@@ -18,6 +18,7 @@ import {
     AddGroupRecipientsResponse,
     CreateGroupMessageResponse,
     CreateMessageResponse,
+    CreateReactGroupMessagePayload,
     CreateReactMessageParams,
     CreateReactMessagePayload,
     DeleteMessageParams,
@@ -321,5 +322,20 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
                 message,
                 conversation,
             });
+    }
+
+    @OnEvent('group.messages.reaction')
+    async groupMessageReaction(payload: CreateReactGroupMessagePayload) {
+        console.log('inside group.messages.reaction');
+        const { groupId, message } = payload;
+        const {
+            author: { id: authorId },
+        } = message;
+        const group = await this.groupService.getGroupById({ id: groupId, userId: authorId });
+        if (!group) return;
+        this.server.to(`group-${group.id}`).emit('onReactGroupMessage', {
+            message,
+            group,
+        });
     }
 }
