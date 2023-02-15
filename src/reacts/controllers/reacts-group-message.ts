@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorator';
@@ -24,6 +24,23 @@ export class ReactsGroupMessageController {
             groupId,
         });
         this.eventEmitter.emit('group.messages.reaction', response);
+        return response;
+    }
+
+    @Delete(':reactId/remove')
+    async removeReactGroupMessage(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) groupId: number,
+        @Param('messageId', ParseIntPipe) messageId: number,
+        @Param('reactId', ParseIntPipe) reactId: number,
+    ) {
+        const response = await this.reactService.removeReactGroupMessage({
+            user,
+            messageId,
+            reactId,
+            id: groupId,
+        });
+        this.eventEmitter.emit('group.messages.reaction.remove', response);
         return response;
     }
 }

@@ -261,3 +261,15 @@ export type CreateReactGroupMessagePayload = {
     message: GroupMessage;
     groupId: number;
 };
+
+export type RemoveReactMessageParams = {
+    messageId: number;
+    reactId: number;
+    user: User;
+    id: number;
+};
+
+export type RemoveReactMessagePayload = {
+    message: GroupMessage;
+    id: number;
+};

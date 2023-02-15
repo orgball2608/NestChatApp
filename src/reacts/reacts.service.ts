@@ -9,6 +9,8 @@ import {
     CreateReactGroupMessagePayload,
     CreateReactMessageParams,
     CreateReactMessagePayload,
+    RemoveReactMessageParams,
+    RemoveReactMessagePayload,
 } from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IReactService } from './reacts';
@@ -30,6 +32,7 @@ export class ReactsService implements IReactService {
                 message,
                 author: user,
             },
+            relations: ['author'],
         });
 
         if (isReacted) {
@@ -70,6 +73,7 @@ export class ReactsService implements IReactService {
                 message: groupMessage,
                 author: user,
             },
+            relations: ['author'],
         });
 
         if (isReacted) {
@@ -95,6 +99,48 @@ export class ReactsService implements IReactService {
         return {
             message: savedMessage,
             groupId,
+        };
+    }
+
+    async removeReact(params: RemoveReactMessageParams): Promise<RemoveReactMessagePayload> {
+        const { id, messageId, user, reactId } = params;
+        const message = await this.messageService.getMessageById(messageId);
+        if (!message) throw new HttpException('Message not found', HttpStatus.BAD_REQUEST);
+        const react = await this.reactMessageRepository.findOne({
+            where: {
+                id: reactId,
+            },
+            relations: ['author'],
+        });
+        if (!react) throw new HttpException('React not found', HttpStatus.BAD_REQUEST);
+        if (react.author.id !== user.id) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+        await this.reactMessageRepository.remove(react);
+        message.reacts = message.reacts.filter((react) => react.id !== reactId);
+        const savedMessage = await this.messageService.save(message);
+        return {
+            message: savedMessage,
+            id,
+        };
+    }
+
+    async removeReactGroupMessage(params: RemoveReactMessageParams): Promise<RemoveReactMessagePayload> {
+        const { id, messageId, user, reactId } = params;
+        const message = await this.groupMessageService.getGroupMessageById(messageId);
+        if (!message) throw new HttpException('Message not found', HttpStatus.BAD_REQUEST);
+        const react = await this.reactGroupMessageRepository.findOne({
+            where: {
+                id: reactId,
+            },
+            relations: ['author'],
+        });
+        if (!react) throw new HttpException('React not found', HttpStatus.BAD_REQUEST);
+        if (react.author.id !== user.id) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+        await this.reactGroupMessageRepository.remove(react);
+        message.reacts = message.reacts.filter((react) => react.id !== reactId);
+        const savedMessage = await this.groupMessageService.save(message);
+        return {
+            message: savedMessage,
+            id,
         };
     }
 }

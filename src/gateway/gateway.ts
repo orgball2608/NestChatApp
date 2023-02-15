@@ -23,6 +23,7 @@ import {
     CreateReactMessagePayload,
     DeleteMessageParams,
     RemoveFriendEventPayload,
+    RemoveReactMessagePayload,
 } from '../utils/types';
 import { Conversation, GroupMessage } from '../utils/typeorm';
 import { IGroupService } from '../groups/interfaces/groups';
@@ -334,6 +335,42 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const group = await this.groupService.getGroupById({ id: groupId, userId: authorId });
         if (!group) return;
         this.server.to(`group-${group.id}`).emit('onReactGroupMessage', {
+            message,
+            group,
+        });
+    }
+
+    @OnEvent('messages.reaction.remove')
+    async RemoveMessageReaction(payload: RemoveReactMessagePayload) {
+        console.log('inside messages.reaction.remove');
+        const { id, message } = payload;
+        const conversation = await this.conversationService.findConversationById(id);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket = this.sessions.getUserSocket(recipient.id);
+        const creatorSocket = this.sessions.getUserSocket(creator.id);
+        if (recipientSocket)
+            recipientSocket.emit('onReactMessageRemove', {
+                message,
+                conversation,
+            });
+        if (creatorSocket)
+            creatorSocket.emit('onReactMessageRemove', {
+                message,
+                conversation,
+            });
+    }
+
+    @OnEvent('group.messages.reaction.remove')
+    async removeGroupMessageReaction(payload: RemoveReactMessagePayload) {
+        console.log('inside group.messages.reaction.remove');
+        const { id, message } = payload;
+        const {
+            author: { id: authorId },
+        } = message;
+        const group = await this.groupService.getGroupById({ id, userId: authorId });
+        if (!group) return;
+        this.server.to(`group-${group.id}`).emit('onReactGroupMessageRemove', {
             message,
             group,
         });
