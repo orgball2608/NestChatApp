@@ -3,6 +3,7 @@ import {
     CreateGifMessageParams,
     CreateMessageParams,
     CreateMessageResponse,
+    CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
 } from '../utils/types';
@@ -11,6 +12,8 @@ export interface IMessageService {
     createMessage(params: CreateMessageParams): Promise<CreateMessageResponse>;
 
     createGifMessage(params: CreateGifMessageParams): Promise<CreateMessageResponse>;
+
+    createStickerMessage(params: CreateStickerMessageParams): Promise<CreateMessageResponse>;
 
     getMessagesByConversationId(conversationId: number): Promise<Message[]>;
 

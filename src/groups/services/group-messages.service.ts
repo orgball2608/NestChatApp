@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import {
     CreateGroupGifMessageParams,
     CreateGroupMessageParams,
+    CreateGroupStickerMessageParams,
     DeleteGroupMessageParams,
     EditGroupMessageParams,
     getGroupMessagesParams,
@@ -174,6 +175,25 @@ export class GroupMessagesService implements IGroupMessageService {
             author: instanceToPlain(author),
             group,
             gif,
+            attachments: [],
+        });
+        const savedMessage = await this.groupMessageRepository.save(groupMessage);
+        group.lastMessageSent = savedMessage;
+        const updatedGroup = await this.groupService.saveGroup(group);
+        return { message: savedMessage, group: updatedGroup };
+    }
+
+    async createGroupStickerMessage(params: CreateGroupStickerMessageParams) {
+        const { author, groupId, sticker } = params;
+        const group = await this.groupService.getGroupById({ id: groupId, userId: author.id });
+        if (!group) throw new HttpException('No Group Found to Create Group Message', HttpStatus.BAD_REQUEST);
+        const existUser = group.users.find((user) => user.id == author.id);
+        if (!existUser) throw new HttpException('User not in Group !Cant create Message', HttpStatus.BAD_REQUEST);
+
+        const groupMessage = this.groupMessageRepository.create({
+            author: instanceToPlain(author),
+            group,
+            sticker,
             attachments: [],
         });
         const savedMessage = await this.groupMessageRepository.save(groupMessage);

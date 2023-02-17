@@ -9,6 +9,7 @@ import {
     CreateGifMessageParams,
     CreateMessageParams,
     CreateMessageResponse,
+    CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
 } from '../utils/types';
@@ -151,6 +152,31 @@ export class MessagesService implements IMessageService {
 
         const message = this.messageRepository.create({
             gif,
+            conversation,
+            author: instanceToPlain(user),
+            attachments: [],
+        });
+        const savedMessage = await this.messageRepository.save(message);
+        conversation.lastMessageSent = savedMessage;
+        const updatedConversation = await this.conversationRepository.save(conversation);
+        return { message: savedMessage, conversation: updatedConversation };
+    }
+
+    async createStickerMessage(params: CreateStickerMessageParams): Promise<CreateMessageResponse> {
+        const { user, sticker, conversationId } = params;
+        const conversation = await this.conversationRepository.findOne({
+            where: { id: conversationId },
+            relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
+        });
+        if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
+
+        const { creator, recipient } = conversation;
+
+        if (creator.id !== user.id && recipient.id !== user.id)
+            throw new HttpException('Cannot Create Message', HttpStatus.FORBIDDEN);
+
+        const message = this.messageRepository.create({
+            sticker,
             conversation,
             author: instanceToPlain(user),
             attachments: [],

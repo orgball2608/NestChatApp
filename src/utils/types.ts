@@ -285,3 +285,15 @@ export type CreateGroupGifMessageParams = {
     author: User;
     gif: string;
 };
+
+export type CreateStickerMessageParams = {
+    conversationId: number;
+    user: User;
+    sticker: string;
+};
+
+export type CreateGroupStickerMessageParams = {
+    groupId: number;
+    author: User;
+    sticker: string;
+};
