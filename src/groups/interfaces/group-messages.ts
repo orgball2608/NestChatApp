@@ -1,5 +1,6 @@
 import { GroupMessage } from 'src/utils/typeorm';
 import {
+    CreateGroupGifMessageParams,
     CreateGroupMessageParams,
     DeleteGroupMessageParams,
     EditGroupMessageParams,
@@ -13,4 +14,5 @@ export interface IGroupMessageService {
     editGroupMessage(params: EditGroupMessageParams);
     getGroupMessageById(id: number): Promise<GroupMessage>;
     save(message: GroupMessage): Promise<GroupMessage>;
+    createGroupGifMessage(params: CreateGroupGifMessageParams);
 }

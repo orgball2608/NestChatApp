@@ -20,6 +20,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EditGroupMessageDto } from '../dtos/EditGroupMessage.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { EmptyMessageException } from 'src/messages/exceptions/EmptyMessage';
+import { CreateGroupGifMessageDto } from '../dtos/CreateGroupGifMessage.dto';
 
 @Controller(Routes.GROUP_MESSAGES)
 export class GroupMessagesController {
@@ -98,5 +99,21 @@ export class GroupMessagesController {
 
         this.eventEmitter.emit('group.message.update', editedMessage);
         return editedMessage;
+    }
+
+    @Post('gif')
+    async createGroupGifMessage(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) groupId: number,
+        @Body() { gif }: CreateGroupGifMessageDto,
+    ) {
+        if (!gif) throw new EmptyMessageException();
+        const response = await this.groupMessageService.createGroupGifMessage({
+            author: user,
+            groupId,
+            gif,
+        });
+        this.eventEmitter.emit('group.message.create', response);
+        return;
     }
 }

@@ -21,6 +21,7 @@ import { EditMessageDto } from './dtos/EditMessage.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AttachmentFile } from 'src/utils/types';
 import { EmptyMessageException } from './exceptions/EmptyMessage';
+import { CreateGifMessageDto } from './dtos/CreateGifMessage.dto';
 
 @Controller(Routes.MESSAGES)
 export class MessagesController {
@@ -48,6 +49,20 @@ export class MessagesController {
         if (!attachments && !content) throw new EmptyMessageException();
         const params = { user, conversationId, content, attachments };
         const response = await this.messageService.createMessage(params);
+        this.eventEmitter.emit('message.create', response);
+        return response;
+    }
+
+    @Post('gif')
+    async createMessageWithGif(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe)
+        conversationId: number,
+        @Body() { gif }: CreateGifMessageDto,
+    ) {
+        if (!gif) throw new EmptyMessageException();
+        const params = { user, conversationId, gif };
+        const response = await this.messageService.createGifMessage(params);
         this.eventEmitter.emit('message.create', response);
         return response;
     }

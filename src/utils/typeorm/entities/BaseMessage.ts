@@ -13,4 +13,10 @@ export abstract class BaseMessage {
 
     @ManyToOne(() => User, (user) => user.messages)
     author: User;
+
+    @Column('text', { nullable: true })
+    gif: string;
+
+    @Column('text', { nullable: true })
+    sticker: string;
 }

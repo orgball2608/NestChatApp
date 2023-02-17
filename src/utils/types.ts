@@ -273,3 +273,15 @@ export type RemoveReactMessagePayload = {
     message: GroupMessage;
     id: number;
 };
+
+export type CreateGifMessageParams = {
+    conversationId: number;
+    user: User;
+    gif: string;
+};
+
+export type CreateGroupGifMessageParams = {
+    groupId: number;
+    author: User;
+    gif: string;
+};

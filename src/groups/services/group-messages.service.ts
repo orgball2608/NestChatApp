@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Group, GroupMessage } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
 import {
+    CreateGroupGifMessageParams,
     CreateGroupMessageParams,
     DeleteGroupMessageParams,
     EditGroupMessageParams,
@@ -160,5 +161,24 @@ export class GroupMessagesService implements IGroupMessageService {
 
     save(message: GroupMessage): Promise<GroupMessage> {
         return this.groupMessageRepository.save(message);
+    }
+
+    async createGroupGifMessage(params: CreateGroupGifMessageParams) {
+        const { author, groupId, gif } = params;
+        const group = await this.groupService.getGroupById({ id: groupId, userId: author.id });
+        if (!group) throw new HttpException('No Group Found to Create Group Message', HttpStatus.BAD_REQUEST);
+        const existUser = group.users.find((user) => user.id == author.id);
+        if (!existUser) throw new HttpException('User not in Group !Cant create Message', HttpStatus.BAD_REQUEST);
+
+        const groupMessage = this.groupMessageRepository.create({
+            author: instanceToPlain(author),
+            group,
+            gif,
+            attachments: [],
+        });
+        const savedMessage = await this.groupMessageRepository.save(groupMessage);
+        group.lastMessageSent = savedMessage;
+        const updatedGroup = await this.groupService.saveGroup(group);
+        return { message: savedMessage, group: updatedGroup };
     }
 }
