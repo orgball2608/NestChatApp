@@ -41,6 +41,7 @@ export class GroupsService implements IGroupService {
             .createQueryBuilder('group')
             .leftJoinAndSelect('group.users', 'user')
             .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
+            .leftJoinAndSelect('lastMessageSent.author', 'author')
             .leftJoinAndSelect('lastMessageSent.attachments', 'attachments')
             .orderBy('lastMessageSent.createdAt', 'DESC')
             .leftJoinAndSelect('group.owner', 'owner')

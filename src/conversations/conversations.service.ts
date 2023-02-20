@@ -21,6 +21,7 @@ export class ConversationsService implements IConversationsService {
         return this.conversationRepository
             .createQueryBuilder('conversation')
             .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
+            .leftJoinAndSelect('lastMessageSent.author', 'author')
             .leftJoinAndSelect('conversation.creator', 'creator')
             .leftJoinAndSelect('creator.profile', 'creatorProfile')
             .leftJoinAndSelect('conversation.recipient', 'recipient')

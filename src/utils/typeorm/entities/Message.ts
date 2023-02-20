@@ -14,6 +14,10 @@ export class Message extends BaseMessage {
     @JoinColumn()
     attachments: Attachment[];
 
+    @OneToOne(() => Message, { createForeignKeyConstraints: false, nullable: true })
+    @JoinColumn()
+    reply: Message;
+
     @OneToMany(() => ReactMessage, (react) => react.message)
     @JoinColumn()
     reacts: ReactMessage[];

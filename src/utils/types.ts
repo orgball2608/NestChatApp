@@ -297,3 +297,17 @@ export type CreateGroupStickerMessageParams = {
     author: User;
     sticker: string;
 };
+
+export type CreateReplyMessageParams = {
+    conversationId: number;
+    user: User;
+    content: string;
+    messageId: number;
+};
+
+export type CreateReplyGroupMessageParams = {
+    groupId: number;
+    user: User;
+    content: string;
+    messageId: number;
+};

@@ -3,6 +3,7 @@ import {
     CreateGifMessageParams,
     CreateMessageParams,
     CreateMessageResponse,
+    CreateReplyMessageParams,
     CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
@@ -22,5 +23,8 @@ export interface IMessageService {
     deleteMessage(params: DeleteMessageParams);
 
     editMessage(params: EditMessageParams): Promise<Message>;
+
     save(message: Message): Promise<Message>;
+
+    createReplyMessage(params: CreateReplyMessageParams): Promise<CreateMessageResponse>;
 }

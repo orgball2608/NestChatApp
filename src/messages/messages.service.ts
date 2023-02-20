@@ -9,6 +9,7 @@ import {
     CreateGifMessageParams,
     CreateMessageParams,
     CreateMessageResponse,
+    CreateReplyMessageParams,
     CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
@@ -52,7 +53,17 @@ export class MessagesService implements IMessageService {
 
     getMessagesByConversationId(conversationId: number): Promise<Message[]> {
         return this.messageRepository.find({
-            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
+            relations: [
+                'author',
+                'author.profile',
+                'attachments',
+                'reacts',
+                'reacts.author',
+                'reply',
+                'reply.author',
+                'reply.author.profile',
+                'reply.attachments',
+            ],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
         });
@@ -129,7 +140,17 @@ export class MessagesService implements IMessageService {
     getMessageById(messageId: number): Promise<Message> {
         return this.messageRepository.findOne({
             where: { id: messageId },
-            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
+            relations: [
+                'author',
+                'author.profile',
+                'attachments',
+                'reacts',
+                'reacts.author',
+                'reply',
+                'reply.author',
+                'reply.author.profile',
+                'reply.attachments',
+            ],
         });
     }
 
@@ -180,6 +201,39 @@ export class MessagesService implements IMessageService {
             conversation,
             author: instanceToPlain(user),
             attachments: [],
+        });
+        const savedMessage = await this.messageRepository.save(message);
+        conversation.lastMessageSent = savedMessage;
+        const updatedConversation = await this.conversationRepository.save(conversation);
+        return { message: savedMessage, conversation: updatedConversation };
+    }
+
+    async createReplyMessage(params: CreateReplyMessageParams): Promise<CreateMessageResponse> {
+        const { user, content, conversationId, messageId } = params;
+        const conversation = await this.conversationRepository.findOne({
+            where: { id: conversationId },
+            relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
+        });
+        if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
+
+        const replyMessage = await this.messageRepository.findOne({
+            where: { id: messageId },
+            relations: ['author', 'author.profile', 'attachments'],
+        });
+
+        if (!replyMessage) throw new HttpException('Reply Message not found', HttpStatus.BAD_REQUEST);
+
+        const { creator, recipient } = conversation;
+
+        if (creator.id !== user.id && recipient.id !== user.id)
+            throw new HttpException('Cannot Create Message', HttpStatus.FORBIDDEN);
+
+        const message = this.messageRepository.create({
+            content,
+            conversation,
+            author: instanceToPlain(user),
+            attachments: [],
+            reply: replyMessage,
         });
         const savedMessage = await this.messageRepository.save(message);
         conversation.lastMessageSent = savedMessage;

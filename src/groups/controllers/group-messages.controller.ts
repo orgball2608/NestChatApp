@@ -22,6 +22,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { EmptyMessageException } from 'src/messages/exceptions/EmptyMessage';
 import { CreateGroupGifMessageDto } from '../dtos/CreateGroupGifMessage.dto';
 import { CreateGroupStickerMessageDto } from '../dtos/CreateGroupStickerMessage.dto';
+import { CreateReplyGroupMessageDto } from '../dtos/CreateReplyGroupMessage';
 
 @Controller(Routes.GROUP_MESSAGES)
 export class GroupMessagesController {
@@ -129,6 +130,24 @@ export class GroupMessagesController {
             author: user,
             groupId,
             sticker,
+        });
+        this.eventEmitter.emit('group.message.create', response);
+        return;
+    }
+
+    @Post(':messageId/reply')
+    async createReplyGroupMessage(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) groupId: number,
+        @Param('messageId', ParseIntPipe) messageId: number,
+        @Body() { content }: CreateReplyGroupMessageDto,
+    ) {
+        if (!content) throw new EmptyMessageException();
+        const response = await this.groupMessageService.createReplyGroupMessage({
+            user,
+            groupId,
+            messageId,
+            content,
         });
         this.eventEmitter.emit('group.message.create', response);
         return;

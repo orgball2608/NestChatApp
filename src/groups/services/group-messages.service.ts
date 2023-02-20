@@ -6,7 +6,9 @@ import { Repository } from 'typeorm';
 import {
     CreateGroupGifMessageParams,
     CreateGroupMessageParams,
+    CreateGroupMessageResponse,
     CreateGroupStickerMessageParams,
+    CreateReplyGroupMessageParams,
     DeleteGroupMessageParams,
     EditGroupMessageParams,
     getGroupMessagesParams,
@@ -51,7 +53,15 @@ export class GroupMessagesService implements IGroupMessageService {
         if (!existUser) throw new HttpException('User not in Group !Cant get Messages', HttpStatus.BAD_REQUEST);
         return await this.groupMessageRepository.find({
             where: { group: { id } },
-            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
+            relations: [
+                'author',
+                'author.profile',
+                'attachments',
+                'reacts',
+                'reacts.author',
+                'reply',
+                'reply.attachments',
+            ],
             order: {
                 createdAt: 'DESC',
             },
@@ -156,7 +166,15 @@ export class GroupMessagesService implements IGroupMessageService {
     getGroupMessageById(id: number) {
         return this.groupMessageRepository.findOne({
             where: { id },
-            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
+            relations: [
+                'author',
+                'author.profile',
+                'attachments',
+                'reacts',
+                'reacts.author',
+                'reply',
+                'reply.attachments',
+            ],
         });
     }
 
@@ -199,6 +217,36 @@ export class GroupMessagesService implements IGroupMessageService {
         const savedMessage = await this.groupMessageRepository.save(groupMessage);
         group.lastMessageSent = savedMessage;
         const updatedGroup = await this.groupService.saveGroup(group);
+        return { message: savedMessage, group: updatedGroup };
+    }
+
+    async createReplyGroupMessage(params: CreateReplyGroupMessageParams): Promise<CreateGroupMessageResponse> {
+        const { messageId, groupId, content, user } = params;
+        const group = await this.groupService.getGroupById({ id: groupId, userId: user.id });
+        if (!group) throw new HttpException('No Group Found to Create Group Message', HttpStatus.BAD_REQUEST);
+        const existUser = group.users.find((u) => u.id == user.id);
+        if (!existUser) throw new HttpException('User not in Group !Cant create Message', HttpStatus.BAD_REQUEST);
+
+        const message = await this.groupMessageRepository.findOne({
+            where: {
+                id: messageId,
+            },
+            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
+        });
+
+        if (!message) throw new HttpException('Message not found', HttpStatus.BAD_REQUEST);
+
+        const groupMessage = this.groupMessageRepository.create({
+            author: instanceToPlain(user),
+            group,
+            content,
+            reply: message,
+            attachments: [],
+        });
+        const savedMessage = await this.groupMessageRepository.save(groupMessage);
+        group.lastMessageSent = savedMessage;
+        const updatedGroup = await this.groupService.saveGroup(group);
+        console.log('savedMessage', savedMessage);
         return { message: savedMessage, group: updatedGroup };
     }
 }

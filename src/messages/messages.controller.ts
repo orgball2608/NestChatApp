@@ -23,6 +23,7 @@ import { AttachmentFile } from 'src/utils/types';
 import { EmptyMessageException } from './exceptions/EmptyMessage';
 import { CreateGifMessageDto } from './dtos/CreateGifMessage.dto';
 import { CreateStickerMessageDto } from './dtos/CreateStickerMessage.dto';
+import { CreateReplyMessageDto } from './dtos/ReplyMessage.dto';
 
 @Controller(Routes.MESSAGES)
 export class MessagesController {
@@ -78,6 +79,22 @@ export class MessagesController {
         if (!sticker) throw new EmptyMessageException();
         const params = { user, conversationId, sticker };
         const response = await this.messageService.createStickerMessage(params);
+        this.eventEmitter.emit('message.create', response);
+        return response;
+    }
+
+    @Post(':messageId/reply')
+    async createReplyMessage(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe)
+        conversationId: number,
+        @Param('messageId', ParseIntPipe)
+        messageId: number,
+        @Body() { content }: CreateReplyMessageDto,
+    ) {
+        if (!content) throw new EmptyMessageException();
+        const params = { user, conversationId, messageId, content };
+        const response = await this.messageService.createReplyMessage(params);
         this.eventEmitter.emit('message.create', response);
         return response;
     }

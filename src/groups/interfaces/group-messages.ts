@@ -4,6 +4,7 @@ import {
     CreateGroupMessageParams,
     CreateGroupMessageResponse,
     CreateGroupStickerMessageParams,
+    CreateReplyGroupMessageParams,
     DeleteGroupMessageParams,
     EditGroupMessageParams,
     getGroupMessagesParams,
@@ -18,4 +19,5 @@ export interface IGroupMessageService {
     save(message: GroupMessage): Promise<GroupMessage>;
     createGroupGifMessage(params: CreateGroupGifMessageParams): Promise<CreateGroupMessageResponse>;
     createGroupStickerMessage(params: CreateGroupStickerMessageParams): Promise<CreateGroupMessageResponse>;
+    createReplyGroupMessage(params: CreateReplyGroupMessageParams): Promise<CreateGroupMessageResponse>;
 }

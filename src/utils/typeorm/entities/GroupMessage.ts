@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { BaseMessage } from './BaseMessage';
 import { Group } from './Group';
 import { GroupAttachment } from './GroupAttachments';
@@ -12,6 +12,10 @@ export class GroupMessage extends BaseMessage {
     @OneToMany(() => GroupAttachment, (attachment) => attachment.message)
     @JoinColumn()
     attachments?: GroupAttachment[];
+
+    @OneToOne(() => GroupMessage, { createForeignKeyConstraints: false, nullable: true })
+    @JoinColumn()
+    reply: GroupMessage;
 
     @OneToMany(() => ReactGroupMessage, (react) => react.message)
     @JoinColumn()
