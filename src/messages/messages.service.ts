@@ -66,6 +66,7 @@ export class MessagesService implements IMessageService {
             ],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
+            withDeleted: true,
         });
     }
 
@@ -94,7 +95,8 @@ export class MessagesService implements IMessageService {
 
         if (!message) throw new HttpException('Cannot delete message', HttpStatus.BAD_REQUEST);
 
-        if (conversation.lastMessageSent.id !== message.id) return this.messageRepository.delete({ id: message.id });
+        if (conversation.lastMessageSent.id !== message.id)
+            return this.messageRepository.softDelete({ id: message.id });
 
         const size = conversation.messages.length;
         const SECOND_MESSAGE_INDEX = 1;
@@ -108,7 +110,7 @@ export class MessagesService implements IMessageService {
                     lastMessageSent: null,
                 },
             );
-            return this.messageRepository.delete({ id: params.messageId });
+            return this.messageRepository.softDelete({ id: params.messageId });
         } else {
             console.log('There are more than 1 message');
             const newLastMessage = conversation.messages[SECOND_MESSAGE_INDEX];
@@ -120,7 +122,7 @@ export class MessagesService implements IMessageService {
                     lastMessageSent: newLastMessage,
                 },
             );
-            return this.messageRepository.delete({ id: params.messageId });
+            return this.messageRepository.softDelete({ id: params.messageId });
         }
     }
 

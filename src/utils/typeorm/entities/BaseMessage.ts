@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
 
 export abstract class BaseMessage {
@@ -19,4 +19,7 @@ export abstract class BaseMessage {
 
     @Column('text', { nullable: true })
     sticker: string;
+
+    @DeleteDateColumn({ name: 'deleted_at' })
+    deletedAt: number;
 }
