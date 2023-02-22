@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Message } from './Message';
 
 @Entity({ name: 'attachments' })
@@ -10,4 +10,7 @@ export class Attachment {
         onDelete: 'CASCADE',
     })
     message: Message;
+
+    @Column({ nullable: true, default: 'image' })
+    type: string;
 }

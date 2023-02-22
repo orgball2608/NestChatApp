@@ -5,4 +5,5 @@ export interface IStorage {
     uploadFile(params: UploadImageParams);
     deleteFile(key: string);
     uploadAttachment(params: uploadAttachmentParams): Promise<Attachment>;
+    uploadFileAttachment(params: uploadAttachmentParams): Promise<Attachment>;
 }

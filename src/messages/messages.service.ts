@@ -25,7 +25,7 @@ export class MessagesService implements IMessageService {
         @Inject(Services.ATTACHMENTS) private readonly attachmentsService: IAttachmentService,
     ) {}
 
-    async createMessage({ user, content, conversationId, attachments }: CreateMessageParams) {
+    async createMessage({ user, content, conversationId, attachments, type }: CreateMessageParams) {
         const conversation = await this.conversationRepository.findOne({
             where: { id: conversationId },
             relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
@@ -37,7 +37,7 @@ export class MessagesService implements IMessageService {
         if (creator.id !== user.id && recipient.id !== user.id)
             throw new HttpException('Cannot Create Message', HttpStatus.FORBIDDEN);
 
-        const newAttachments = attachments ? await this.attachmentsService.create(attachments) : [];
+        const newAttachments = attachments ? await this.attachmentsService.create(attachments, type) : [];
 
         const message = this.messageRepository.create({
             content,

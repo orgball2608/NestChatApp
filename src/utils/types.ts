@@ -32,6 +32,7 @@ export type CreateMessageParams = {
     attachments?: AttachmentFile[];
     conversationId: number;
     user: User;
+    type: string;
 };
 
 export type CreateMessageResponse = {
@@ -72,6 +73,7 @@ export type CreateGroupMessageParams = {
     content: string;
     author: User;
     attachments?: AttachmentFile[];
+    type: string;
 };
 
 export type CreateGroupMessageResponse = {
@@ -322,3 +324,5 @@ export type ChangeGroupEmojiIconParams = {
     emoji: string;
     userId: number;
 };
+
+export type AttachmentType = 'image' | 'file';

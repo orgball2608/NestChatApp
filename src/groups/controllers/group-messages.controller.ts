@@ -43,14 +43,15 @@ export class GroupMessagesController {
         @AuthUser() user: User,
         @Param('id', ParseIntPipe) groupId: number,
         @UploadedFiles() { attachments }: { attachments: AttachmentFile[] },
-        @Body() { content }: CreateGroupMessageDto,
+        @Body() { content, type }: CreateGroupMessageDto,
     ) {
-        if (!attachments && !content) throw new EmptyMessageException();
+        if ((!attachments && !content) || (attachments && !type)) throw new EmptyMessageException();
         const response = await this.groupMessageService.createGroupMessage({
             author: user,
             groupId,
             content,
             attachments,
+            type,
         });
         this.eventEmitter.emit('group.message.create', response);
         return;

@@ -14,21 +14,43 @@ export class AttachmentsService implements IAttachmentService {
         @Inject(Services.IMAGE_UPLOAD_SERVICE) private readonly imageUploadService,
     ) {}
 
-    create(attachments: AttachmentFile[]): Promise<Attachment[]> {
-        const promise = attachments.map(async (a) => {
-            const newAttachment = this.attachRepository.create();
-            const attachment = await this.attachRepository.save(newAttachment);
-            return this.imageUploadService.uploadAttachment({ attachment, file: a });
-        });
-        return Promise.all(promise);
+    create(attachments: AttachmentFile[], type: string): Promise<Attachment[]> {
+        if (type === 'image') {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.attachRepository.create();
+                newAttachment.type = 'image';
+                const attachment = await this.attachRepository.save(newAttachment);
+                return this.imageUploadService.uploadAttachment({ attachment, file: a });
+            });
+            return Promise.all(promise);
+        } else {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.attachRepository.create();
+                newAttachment.type = 'file';
+                const attachment = await this.attachRepository.save(newAttachment);
+                return this.imageUploadService.uploadFileAttachment({ attachment, file: a });
+            });
+            return Promise.all(promise);
+        }
     }
 
-    createGroupAttachments(attachments: AttachmentFile[]): Promise<GroupAttachment[]> {
-        const promise = attachments.map(async (a) => {
-            const newAttachment = this.groupAttachRepository.create();
-            const attachment = await this.groupAttachRepository.save(newAttachment);
-            return this.imageUploadService.uploadAttachment({ attachment, file: a });
-        });
-        return Promise.all(promise);
+    createGroupAttachments(attachments: AttachmentFile[], type: string): Promise<GroupAttachment[]> {
+        if (type === 'image') {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.groupAttachRepository.create();
+                newAttachment.type = 'image';
+                const attachment = await this.groupAttachRepository.save(newAttachment);
+                return this.imageUploadService.uploadAttachment({ attachment, file: a });
+            });
+            return Promise.all(promise);
+        } else {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.groupAttachRepository.create();
+                newAttachment.type = 'file';
+                const attachment = await this.groupAttachRepository.save(newAttachment);
+                return this.imageUploadService.uploadFileAttachment({ attachment, file: a });
+            });
+            return Promise.all(promise);
+        }
     }
 }

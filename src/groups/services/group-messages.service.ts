@@ -27,12 +27,14 @@ export class GroupMessagesService implements IGroupMessageService {
         @Inject(Services.ATTACHMENTS) private readonly attachmentsService: IAttachmentService,
     ) {}
     async createGroupMessage(params: CreateGroupMessageParams) {
-        const { author, groupId, content, attachments } = params;
+        const { author, groupId, content, attachments, type } = params;
         const group = await this.groupService.getGroupById({ id: groupId, userId: author.id });
         if (!group) throw new HttpException('No Group Found to Create Group Message', HttpStatus.BAD_REQUEST);
         const existUser = group.users.find((user) => user.id == author.id);
         if (!existUser) throw new HttpException('User not in Group !Cant create Message', HttpStatus.BAD_REQUEST);
-        const newAttachments = attachments ? await this.attachmentsService.createGroupAttachments(attachments) : [];
+        const newAttachments = attachments
+            ? await this.attachmentsService.createGroupAttachments(attachments, type)
+            : [];
 
         const groupMessage = this.groupMessageRepository.create({
             author: instanceToPlain(author),

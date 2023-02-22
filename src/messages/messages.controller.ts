@@ -46,10 +46,10 @@ export class MessagesController {
         @UploadedFiles() { attachments }: { attachments: AttachmentFile[] },
         @Param('id', ParseIntPipe)
         conversationId: number,
-        @Body() { content }: CreateMessageDto,
+        @Body() { content, type }: CreateMessageDto,
     ) {
-        if (!attachments && !content) throw new EmptyMessageException();
-        const params = { user, conversationId, content, attachments };
+        if ((!attachments && !content) || (attachments && !type)) throw new EmptyMessageException();
+        const params = { user, conversationId, content, attachments, type };
         const response = await this.messageService.createMessage(params);
         this.eventEmitter.emit('message.create', response);
         return response;

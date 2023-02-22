@@ -63,4 +63,17 @@ export class StorageService implements IStorage {
         await this.spacesClient.putObject(uploadPreviewParams).promise();
         return attachment;
     }
+
+    async uploadFileAttachment(params: uploadAttachmentParams): Promise<Attachment> {
+        const { attachment, file } = params;
+        const uploadOriginalParams = {
+            Bucket: process.env.AWS_PUBLIC_BUCKET_KEY,
+            Key: attachment.key,
+            Body: file.buffer,
+            ACL: 'public-read',
+            ContentType: file.mimetype,
+        };
+        await this.spacesClient.putObject(uploadOriginalParams).promise();
+        return attachment;
+    }
 }
