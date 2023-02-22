@@ -5,6 +5,8 @@ import { Group, User } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
 import {
     AccessParams,
+    ChangeEmojiIconParams,
+    ChangeGroupEmojiIconParams,
     changeOwnerParams,
     CreateGroupParams,
     EditGroupTitleParams,
@@ -148,5 +150,13 @@ export class GroupsService implements IGroupService {
         group.avatar = avatarUrl;
         const savedGroup = await this.groupRepository.save(group);
         return savedGroup;
+    }
+
+    async changeGroupEmojiIcon(params: ChangeGroupEmojiIconParams): Promise<Group> {
+        const { groupId, userId, emoji } = params;
+        const group = await this.getGroupById({ id: groupId, userId });
+        if (!group) throw new GroupNotFoundException();
+        group.emoji = emoji;
+        return this.groupRepository.save(group);
     }
 }

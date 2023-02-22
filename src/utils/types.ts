@@ -311,3 +311,14 @@ export type CreateReplyGroupMessageParams = {
     content: string;
     messageId: number;
 };
+
+export type ChangeEmojiIconParams = {
+    id: number;
+    emoji: string;
+};
+
+export type ChangeGroupEmojiIconParams = {
+    groupId: number;
+    emoji: string;
+    userId: number;
+};

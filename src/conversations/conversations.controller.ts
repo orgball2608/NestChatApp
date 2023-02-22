@@ -6,6 +6,7 @@ import { User } from '../utils/typeorm';
 import { IConversationsService } from './conversations';
 import { CreateConversationDto } from './dtos/CreateConversation.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ChangeEmojiIconDto } from './dtos/ChangeEmojiIcon.dto';
 
 @Controller(Routes.CONVERSATIONS)
 @UseGuards(AuthenticatedGuard)
@@ -31,5 +32,15 @@ export class ConversationsController {
     @Get(':id')
     async getConversationById(@Param('id') id: number) {
         return await this.conversationsService.findConversationById(id);
+    }
+
+    @Post(':id/emoji')
+    async changeEmojiIcon(@Param('id') id: number, @Body() { emoji }: ChangeEmojiIconDto) {
+        const conversation = await this.conversationsService.changeEmojiIcon({
+            id,
+            emoji,
+        });
+        this.eventEmitter.emit('conversation.emoji.change', conversation);
+        return conversation;
     }
 }

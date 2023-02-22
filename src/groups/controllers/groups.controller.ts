@@ -22,6 +22,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EditGroupTitleDto } from '../dtos/EditGroupTitle.dto';
 import { TransferOwnerDto } from '../dtos/TransferOwner.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { userInfo } from 'os';
+import { ChangeGroupEmojiDto } from '../dtos/ChangeGroupEmoji.dto';
 
 @Controller(Routes.GROUPS)
 export class GroupsController {
@@ -106,5 +108,20 @@ export class GroupsController {
         });
         this.eventEmitter.emit('group.avatar.update', response);
         return response;
+    }
+
+    @Post(':id/emoji')
+    async changeGroupEmojiIcon(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) id: number,
+        @Body() { emoji }: ChangeGroupEmojiDto,
+    ) {
+        const group = await this.groupServices.changeGroupEmojiIcon({
+            groupId: id,
+            userId: user.id,
+            emoji,
+        });
+        this.eventEmitter.emit('group.emoji.change', group);
+        return group;
     }
 }

@@ -1,5 +1,6 @@
 import {
     AccessParams,
+    ChangeGroupEmojiIconParams,
     changeOwnerParams,
     CreateGroupParams,
     EditGroupTitleParams,
@@ -20,4 +21,5 @@ export interface IGroupService {
     updateOwner();
     changeOwner(params: changeOwnerParams): Promise<Group>;
     updateGroupAvatar(params: UpdateGroupAvatarParams): Promise<Group>;
+    changeGroupEmojiIcon(params: ChangeGroupEmojiIconParams): Promise<Group>;
 }

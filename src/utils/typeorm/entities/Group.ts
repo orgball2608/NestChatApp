@@ -51,4 +51,7 @@ export class Group {
 
     @Column({ nullable: true })
     avatar?: string;
+
+    @Column({ nullable: true, default: '👍🏽' })
+    emoji?: string;
 }

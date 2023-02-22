@@ -25,7 +25,7 @@ import {
     RemoveFriendEventPayload,
     RemoveReactMessagePayload,
 } from '../utils/types';
-import { Conversation, GroupMessage } from '../utils/typeorm';
+import { Conversation, Group, GroupMessage } from '../utils/typeorm';
 import { IGroupService } from '../groups/interfaces/groups';
 import { IFriendService } from 'src/friends/friends';
 
@@ -374,5 +374,25 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
             message,
             group,
         });
+    }
+
+    @OnEvent('conversation.emoji.change')
+    async changeConversationEmoji(payload: Conversation) {
+        console.log('inside conversation.emoji.change');
+        const { id } = payload;
+        const conversation = await this.conversationService.findConversationById(id);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket = this.sessions.getUserSocket(recipient.id);
+        const creatorSocket = this.sessions.getUserSocket(creator.id);
+        if (recipientSocket) recipientSocket.emit('onChangeConversationEmoji', conversation);
+        if (creatorSocket) creatorSocket.emit('onChangeConversationEmoji', conversation);
+    }
+
+    @OnEvent('group.emoji.change')
+    async changeGroupEmoji(payload: Group) {
+        console.log('inside group.emoji.change');
+        const { id } = payload;
+        this.server.to(`group-${id}`).emit('onChangeGroupEmoji', payload);
     }
 }

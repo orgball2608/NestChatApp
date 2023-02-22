@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { IUserService } from '../users/interfaces/user';
 import { Services } from '../utils/constants';
 import { Conversation, User } from '../utils/typeorm';
-import { AccessParams, CreateConversationParams } from '../utils/types';
+import { AccessParams, ChangeEmojiIconParams, CreateConversationParams } from '../utils/types';
 import { IConversationsService } from './conversations';
 import { ConversationNotFoundException } from './exceptions/ConversationNotFound';
 
@@ -75,5 +75,13 @@ export class ConversationsService implements IConversationsService {
         const conversation = await this.findConversationById(id);
         if (!conversation) throw new ConversationNotFoundException();
         return conversation.creator.id === userId || conversation.recipient.id === userId;
+    }
+
+    async changeEmojiIcon(params: ChangeEmojiIconParams): Promise<Conversation> {
+        const { id, emoji } = params;
+        const conversation = await this.findConversationById(id);
+        if (!conversation) throw new ConversationNotFoundException();
+        conversation.emoji = emoji;
+        return this.conversationRepository.save(conversation);
     }
 }

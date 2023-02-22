@@ -1,4 +1,5 @@
 import {
+    Column,
     CreateDateColumn,
     Entity,
     Index,
@@ -40,4 +41,7 @@ export class Conversation {
 
     @UpdateDateColumn({ name: 'updated_at' })
     lastMessageSentAt: Date;
+
+    @Column({ nullable: true, default: '👍🏽' })
+    emoji?: string;
 }
