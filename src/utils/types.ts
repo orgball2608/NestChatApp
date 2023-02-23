@@ -326,3 +326,16 @@ export type ChangeGroupEmojiIconParams = {
 };
 
 export type AttachmentType = 'image' | 'file';
+
+export type getConversationMessagesParams = {
+    conversationId: number;
+    offset: number;
+    limit: number;
+};
+
+export type getGroupMessagesWithLimitParams = {
+    id: number;
+    author: User;
+    offset: number;
+    limit: number;
+};

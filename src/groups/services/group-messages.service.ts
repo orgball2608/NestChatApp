@@ -12,6 +12,7 @@ import {
     DeleteGroupMessageParams,
     EditGroupMessageParams,
     getGroupMessagesParams,
+    getGroupMessagesWithLimitParams,
 } from '../../utils/types';
 import { Services } from '../../utils/constants';
 import { IGroupService } from '../interfaces/groups';
@@ -68,6 +69,35 @@ export class GroupMessagesService implements IGroupMessageService {
             order: {
                 createdAt: 'DESC',
             },
+            take: 10,
+            skip: 0,
+            withDeleted: true,
+        });
+    }
+
+    async getGroupMessagesWithLimit(params: getGroupMessagesWithLimitParams) {
+        const { author, id, limit, offset } = params;
+        const group = await this.groupService.getGroupById({ id, userId: author.id });
+        if (!group) throw new HttpException('No Group Found to Get GroupMessage', HttpStatus.BAD_REQUEST);
+        const existUser = group.users.find((user) => user.id == author.id);
+        if (!existUser) throw new HttpException('User not in Group !Cant get Messages', HttpStatus.BAD_REQUEST);
+        return await this.groupMessageRepository.find({
+            where: { group: { id } },
+            relations: [
+                'author',
+                'author.profile',
+                'attachments',
+                'reacts',
+                'reacts.author',
+                'reacts.author.profile',
+                'reply',
+                'reply.attachments',
+            ],
+            order: {
+                createdAt: 'DESC',
+            },
+            take: limit,
+            skip: offset,
             withDeleted: true,
         });
     }
@@ -252,5 +282,12 @@ export class GroupMessagesService implements IGroupMessageService {
         group.lastMessageSent = savedMessage;
         const updatedGroup = await this.groupService.saveGroup(group);
         return { message: savedMessage, group: updatedGroup };
+    }
+
+    async getGroupMessagesLength(id: number): Promise<number> {
+        return this.groupMessageRepository.count({
+            where: { group: { id } },
+            withDeleted: true,
+        });
     }
 }

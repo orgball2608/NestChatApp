@@ -7,6 +7,7 @@ import {
     CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
+    getConversationMessagesParams,
 } from '../utils/types';
 
 export interface IMessageService {
@@ -18,6 +19,8 @@ export interface IMessageService {
 
     getMessagesByConversationId(conversationId: number): Promise<Message[]>;
 
+    getMessagesWithLimit(params: getConversationMessagesParams): Promise<Message[]>;
+
     getMessageById(messageId: number): Promise<Message>;
 
     deleteMessage(params: DeleteMessageParams);
@@ -27,4 +30,6 @@ export interface IMessageService {
     save(message: Message): Promise<Message>;
 
     createReplyMessage(params: CreateReplyMessageParams): Promise<CreateMessageResponse>;
+
+    getMessagesLengthByConversationId(conversationId: number): Promise<number>;
 }

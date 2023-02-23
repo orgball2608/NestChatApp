@@ -100,8 +100,22 @@ export class MessagesController {
     }
 
     @Get()
-    async getMessagesFromConversation(@AuthUser() user: User, @Param('id', ParseIntPipe) id: number) {
+    async getMessagesFromConversation(@Param('id', ParseIntPipe) id: number) {
         const messages = await this.messageService.getMessagesByConversationId(id);
+        return { id: id, messages };
+    }
+
+    @Get('limit/:limit/offset/:offset')
+    async getMessagesWithLimit(
+        @Param('id', ParseIntPipe) id: number,
+        @Param('limit', ParseIntPipe) limit: number,
+        @Param('offset', ParseIntPipe) offset: number,
+    ) {
+        const messages = await this.messageService.getMessagesWithLimit({
+            conversationId: id,
+            limit,
+            offset,
+        });
         return { id: id, messages };
     }
 
@@ -137,5 +151,10 @@ export class MessagesController {
         const messageResponse = await this.messageService.editMessage(params);
         this.eventEmitter.emit('message.edit', messageResponse);
         return messageResponse;
+    }
+
+    @Get('length')
+    getMessageLength(@Param('id', ParseIntPipe) id: number) {
+        return this.messageService.getMessagesLengthByConversationId(id);
     }
 }

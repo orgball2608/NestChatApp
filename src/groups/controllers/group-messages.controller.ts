@@ -66,6 +66,22 @@ export class GroupMessagesController {
         return { id, messages };
     }
 
+    @Get('limit/:limit/offset/:offset')
+    async getGroupMessagesWithLimit(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) id: number,
+        @Param('limit', ParseIntPipe) limit: number,
+        @Param('offset', ParseIntPipe) offset: number,
+    ): Promise<getGroupMessagesResponse> {
+        const messages = await this.groupMessageService.getGroupMessagesWithLimit({
+            id,
+            author: user,
+            limit,
+            offset,
+        });
+        return { id, messages };
+    }
+
     @Delete(':messageId')
     async deleteGroupMessage(
         @AuthUser() user: User,
@@ -152,5 +168,10 @@ export class GroupMessagesController {
         });
         this.eventEmitter.emit('group.message.create', response);
         return;
+    }
+
+    @Get('length')
+    getGroupMessagesLength(@Param('id', ParseIntPipe) id: number): Promise<{ length: number }> {
+        return this.groupMessageService.getGroupMessagesLength(id);
     }
 }

@@ -13,6 +13,7 @@ import {
     CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
+    getConversationMessagesParams,
 } from '../utils/types';
 import { IMessageService } from './messages';
 @Injectable()
@@ -67,6 +68,35 @@ export class MessagesService implements IMessageService {
             ],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
+            take: 10,
+            skip: 0,
+            withDeleted: true,
+        });
+    }
+
+    getMessagesLengthByConversationId(conversationId: number): Promise<number> {
+        return this.messageRepository.count({ conversation: { id: conversationId } });
+    }
+
+    async getMessagesWithLimit(params: getConversationMessagesParams): Promise<Message[]> {
+        const { conversationId, limit, offset } = params;
+        return this.messageRepository.find({
+            relations: [
+                'author',
+                'author.profile',
+                'attachments',
+                'reacts',
+                'reacts.author',
+                'reacts.author.profile',
+                'reply',
+                'reply.author',
+                'reply.author.profile',
+                'reply.attachments',
+            ],
+            where: { conversation: { id: conversationId } },
+            order: { createdAt: 'DESC' },
+            take: limit,
+            skip: offset,
             withDeleted: true,
         });
     }
