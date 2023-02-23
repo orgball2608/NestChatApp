@@ -13,4 +13,10 @@ export class GroupAttachment {
 
     @Column({ nullable: true, default: 'image' })
     type: string;
+
+    @Column({ nullable: true })
+    name: string;
+
+    @Column({ nullable: true })
+    size: number;
 }

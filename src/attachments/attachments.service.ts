@@ -19,6 +19,8 @@ export class AttachmentsService implements IAttachmentService {
             const promise = attachments.map(async (a) => {
                 const newAttachment = this.attachRepository.create();
                 newAttachment.type = 'image';
+                newAttachment.name = a.originalname;
+                newAttachment.size = a.size;
                 const attachment = await this.attachRepository.save(newAttachment);
                 return this.imageUploadService.uploadAttachment({ attachment, file: a });
             });
@@ -27,6 +29,8 @@ export class AttachmentsService implements IAttachmentService {
             const promise = attachments.map(async (a) => {
                 const newAttachment = this.attachRepository.create();
                 newAttachment.type = 'file';
+                newAttachment.name = a.originalname;
+                newAttachment.size = a.size;
                 const attachment = await this.attachRepository.save(newAttachment);
                 return this.imageUploadService.uploadFileAttachment({ attachment, file: a });
             });
@@ -39,6 +43,8 @@ export class AttachmentsService implements IAttachmentService {
             const promise = attachments.map(async (a) => {
                 const newAttachment = this.groupAttachRepository.create();
                 newAttachment.type = 'image';
+                newAttachment.name = a.originalname;
+                newAttachment.size = a.size;
                 const attachment = await this.groupAttachRepository.save(newAttachment);
                 return this.imageUploadService.uploadAttachment({ attachment, file: a });
             });
@@ -47,6 +53,8 @@ export class AttachmentsService implements IAttachmentService {
             const promise = attachments.map(async (a) => {
                 const newAttachment = this.groupAttachRepository.create();
                 newAttachment.type = 'file';
+                newAttachment.name = a.originalname;
+                newAttachment.size = a.size;
                 const attachment = await this.groupAttachRepository.save(newAttachment);
                 return this.imageUploadService.uploadFileAttachment({ attachment, file: a });
             });
