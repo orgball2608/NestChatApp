@@ -14,6 +14,7 @@ import {
     DeleteMessageParams,
     EditMessageParams,
     getConversationMessagesParams,
+    SearchMessagesByContentParams,
 } from '../utils/types';
 import { IMessageService } from './messages';
 @Injectable()
@@ -68,8 +69,6 @@ export class MessagesService implements IMessageService {
             ],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
-            take: 10,
-            skip: 0,
             withDeleted: true,
         });
     }
@@ -273,5 +272,25 @@ export class MessagesService implements IMessageService {
         conversation.lastMessageSent = savedMessage;
         const updatedConversation = await this.conversationRepository.save(conversation);
         return { message: savedMessage, conversation: updatedConversation };
+    }
+
+    searchMessagesByContent(params: SearchMessagesByContentParams): Promise<Message[]> {
+        const { conversationId, content } = params;
+        return this.messageRepository
+            .createQueryBuilder('message')
+            .leftJoinAndSelect('message.author', 'author')
+            .leftJoinAndSelect('author.profile', 'profile')
+            .leftJoinAndSelect('message.attachments', 'attachments')
+            .leftJoinAndSelect('message.reacts', 'reacts')
+            .leftJoinAndSelect('reacts.author', 'reactAuthor')
+            .leftJoinAndSelect('reactAuthor.profile', 'reactAuthorProfile')
+            .leftJoinAndSelect('message.reply', 'reply')
+            .leftJoinAndSelect('reply.author', 'replyAuthor')
+            .leftJoinAndSelect('replyAuthor.profile', 'replyAuthorProfile')
+            .leftJoinAndSelect('reply.attachments', 'replyAttachments')
+            .where('message.conversationId = :conversationId', { conversationId })
+            .andWhere('message.content LIKE :content', { content: `%${content}%` })
+            .orderBy('message.createdAt', 'DESC')
+            .getMany();
     }
 }

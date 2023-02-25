@@ -8,6 +8,7 @@ import {
     DeleteMessageParams,
     EditMessageParams,
     getConversationMessagesParams,
+    SearchMessagesByContentParams,
 } from '../utils/types';
 
 export interface IMessageService {
@@ -32,4 +33,6 @@ export interface IMessageService {
     createReplyMessage(params: CreateReplyMessageParams): Promise<CreateMessageResponse>;
 
     getMessagesLengthByConversationId(conversationId: number): Promise<number>;
+
+    searchMessagesByContent(params: SearchMessagesByContentParams): Promise<Message[]>;
 }

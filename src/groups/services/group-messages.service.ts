@@ -69,8 +69,6 @@ export class GroupMessagesService implements IGroupMessageService {
             order: {
                 createdAt: 'DESC',
             },
-            take: 10,
-            skip: 0,
             withDeleted: true,
         });
     }

@@ -339,3 +339,8 @@ export type getGroupMessagesWithLimitParams = {
     offset: number;
     limit: number;
 };
+
+export type SearchMessagesByContentParams = {
+    conversationId: number;
+    content: string;
+};

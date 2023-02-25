@@ -24,6 +24,7 @@ import { EmptyMessageException } from './exceptions/EmptyMessage';
 import { CreateGifMessageDto } from './dtos/CreateGifMessage.dto';
 import { CreateStickerMessageDto } from './dtos/CreateStickerMessage.dto';
 import { CreateReplyMessageDto } from './dtos/ReplyMessage.dto';
+import { SearchMessageByContentDto } from './dtos/searchMessageByContent.dto';
 
 @Controller(Routes.MESSAGES)
 export class MessagesController {
@@ -156,5 +157,13 @@ export class MessagesController {
     @Get('length')
     getMessageLength(@Param('id', ParseIntPipe) id: number) {
         return this.messageService.getMessagesLengthByConversationId(id);
+    }
+
+    @Post('search')
+    searchMessageByContent(@Param('id', ParseIntPipe) id: number, @Body() { content }: SearchMessageByContentDto) {
+        return this.messageService.searchMessagesByContent({
+            conversationId: id,
+            content,
+        });
     }
 }
