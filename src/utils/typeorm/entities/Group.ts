@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { User } from './User';
 import { GroupMessage } from './GroupMessage';
+import { GroupNickname } from './GroupNickname';
 
 @Entity({ name: 'groups' })
 export class Group {
@@ -54,4 +55,8 @@ export class Group {
 
     @Column({ nullable: true, default: '👍🏽' })
     emoji?: string;
+
+    @OneToMany(() => GroupNickname, (groupNickname) => groupNickname.group)
+    @JoinColumn()
+    nicknames: GroupNickname[];
 }

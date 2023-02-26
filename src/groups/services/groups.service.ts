@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IGroupService } from '../interfaces/groups';
-import { Group, User } from '../../utils/typeorm';
+import { Group, GroupNickname, User } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
 import {
     AccessParams,
     ChangeEmojiIconParams,
     ChangeGroupEmojiIconParams,
+    ChangeGroupNicknameParams,
     changeOwnerParams,
     CreateGroupParams,
     EditGroupTitleParams,
@@ -26,6 +27,7 @@ import { generateUUIDV4 } from 'src/utils/helpers';
 export class GroupsService implements IGroupService {
     constructor(
         @InjectRepository(Group) private readonly groupRepository: Repository<Group>,
+        @InjectRepository(GroupNickname) private readonly groupNicknameRepository: Repository<GroupNickname>,
         @Inject(Services.USERS) private readonly userService: IUserService,
         @Inject(Services.IMAGE_UPLOAD_SERVICE) private readonly imageUploadService,
     ) {}
@@ -50,6 +52,8 @@ export class GroupsService implements IGroupService {
             .leftJoinAndSelect('group.creator', 'creator')
             .leftJoinAndSelect('owner.profile', 'ownerProfile')
             .leftJoinAndSelect('creator.profile', 'creatorProfile')
+            .leftJoinAndSelect('group.nicknames', 'nicknames')
+            .leftJoinAndSelect('nicknames.user', 'userNickname')
             .leftJoinAndSelect('group.users', 'users')
             .leftJoinAndSelect('users.profile', 'usersProfile')
             .where('user.id = :userId', { userId: params.userId })
@@ -70,6 +74,8 @@ export class GroupsService implements IGroupService {
                 'creator.profile',
                 'owner.profile',
                 'users.profile',
+                'nicknames',
+                'nicknames.user',
             ],
         });
         if (!group) throw new GroupNotFoundException();
@@ -86,7 +92,15 @@ export class GroupsService implements IGroupService {
             where: {
                 id: groupId,
             },
-            relations: ['creator', 'users', 'lastMessageSent', 'owner', 'creator.profile', 'owner.profile'],
+            relations: [
+                'creator',
+                'users',
+                'lastMessageSent',
+                'owner',
+                'creator.profile',
+                'owner.profile',
+                'users.profile',
+            ],
         });
         if (!group) return;
         const checkUser = group.users.find((user) => user.id === userId);
@@ -157,6 +171,33 @@ export class GroupsService implements IGroupService {
         const group = await this.getGroupById({ id: groupId, userId });
         if (!group) throw new GroupNotFoundException();
         group.emoji = emoji;
+        return this.groupRepository.save(group);
+    }
+
+    async changeGroupNickname(params: ChangeGroupNicknameParams): Promise<Group> {
+        const { groupId, email, nickname, authorId } = params;
+        const group = await this.getGroupById({
+            id: groupId,
+            userId: authorId,
+        });
+        if (!group) throw new GroupNotFoundException();
+        const user = group.users.find((user) => user.email === email);
+        if (!user) throw new UserNotFoundException();
+        const nicknameEntity = group.nicknames.find((nickname) => nickname.user.id === user.id);
+        if (nicknameEntity) {
+            nicknameEntity.nickname = nickname;
+            group.nicknames = group.nicknames.filter((nickname) => nickname.user.id !== user.id);
+            this.groupNicknameRepository.save(nicknameEntity);
+            group.nicknames.push(nicknameEntity);
+        } else {
+            const newNickname = this.groupNicknameRepository.create({
+                group,
+                user,
+                nickname,
+            });
+            this.groupNicknameRepository.save(newNickname);
+            group.nicknames.push(newNickname);
+        }
         return this.groupRepository.save(group);
     }
 }

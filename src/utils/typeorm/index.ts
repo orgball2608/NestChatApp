@@ -11,6 +11,8 @@ import { Attachment } from './entities/Attachment';
 import { GroupAttachment } from './entities/GroupAttachments';
 import { ReactMessage } from './entities/ReactMessage';
 import { ReactGroupMessage } from './entities/ReactGroupMessage';
+import { ConversationNickname } from './entities/ConversationNickname';
+import { GroupNickname } from './entities/GroupNickname';
 
 const entities = [
     User,
@@ -26,6 +28,8 @@ const entities = [
     GroupAttachment,
     ReactMessage,
     ReactGroupMessage,
+    ConversationNickname,
+    GroupNickname,
 ];
 
 export default entities;
@@ -44,4 +48,6 @@ export {
     GroupAttachment,
     ReactMessage,
     ReactGroupMessage,
+    ConversationNickname,
+    GroupNickname,
 };

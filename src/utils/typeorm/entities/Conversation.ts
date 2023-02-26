@@ -9,6 +9,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { ConversationNickname } from './ConversationNickname';
 import { Message } from './Message';
 import { User } from './User';
 
@@ -44,4 +45,8 @@ export class Conversation {
 
     @Column({ nullable: true, default: '👍🏽' })
     emoji?: string;
+
+    @OneToMany(() => ConversationNickname, (conversationNickname) => conversationNickname.conversation)
+    @JoinColumn()
+    nicknames: ConversationNickname[];
 }

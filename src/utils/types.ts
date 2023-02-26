@@ -344,3 +344,16 @@ export type SearchMessagesByContentParams = {
     conversationId: number;
     content: string;
 };
+
+export type ChangeConversationNicknameParams = {
+    email: string;
+    conversationId: number;
+    nickname: string;
+};
+
+export type ChangeGroupNicknameParams = {
+    email: string;
+    groupId: number;
+    nickname: string;
+    authorId: number;
+};

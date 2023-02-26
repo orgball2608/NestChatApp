@@ -24,6 +24,7 @@ import { TransferOwnerDto } from '../dtos/TransferOwner.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { userInfo } from 'os';
 import { ChangeGroupEmojiDto } from '../dtos/ChangeGroupEmoji.dto';
+import { ChangeGroupNicknameDto } from '../dtos/ChangeGroupNickname.dto';
 
 @Controller(Routes.GROUPS)
 export class GroupsController {
@@ -122,6 +123,22 @@ export class GroupsController {
             emoji,
         });
         this.eventEmitter.emit('group.emoji.change', group);
+        return group;
+    }
+
+    @Post(':id/nickname')
+    async changeGroupNickname(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) id: number,
+        @Body() { nickname, email }: ChangeGroupNicknameDto,
+    ) {
+        const group = await this.groupServices.changeGroupNickname({
+            groupId: id,
+            authorId: user.id,
+            nickname,
+            email,
+        });
+        this.eventEmitter.emit('group.nickname.change', group);
         return group;
     }
 }

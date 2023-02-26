@@ -3,13 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { isAuthorized } from 'src/utils/helpers';
 import { UsersModule } from '../users/users.module';
 import { Services } from '../utils/constants';
-import { Conversation } from '../utils/typeorm';
+import { Conversation, ConversationNickname } from '../utils/typeorm';
 import { ConversationsController } from './conversations.controller';
 import { ConversationsService } from './conversations.service';
 import { ConversationMiddleware } from './middlewares/conversation.middleware';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Conversation]), UsersModule],
+    imports: [TypeOrmModule.forFeature([Conversation, ConversationNickname]), UsersModule],
     controllers: [ConversationsController],
     providers: [
         {

@@ -10,7 +10,7 @@ import {
     OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { ServerEvents, Services, WebsocketEvents } from '../utils/constants';
+import { ServerEvents, Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
 import { IGatewaySessionManager } from './gateway.session';
 import {
@@ -19,7 +19,6 @@ import {
     CreateGroupMessageResponse,
     CreateMessageResponse,
     CreateReactGroupMessagePayload,
-    CreateReactMessageParams,
     CreateReactMessagePayload,
     DeleteMessageParams,
     RemoveFriendEventPayload,
@@ -394,5 +393,25 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         console.log('inside group.emoji.change');
         const { id } = payload;
         this.server.to(`group-${id}`).emit('onChangeGroupEmoji', payload);
+    }
+
+    @OnEvent('conversation.nickname.change')
+    async changeConversationNickname(payload: Conversation) {
+        console.log('inside conversation.nickname.change');
+        const { id } = payload;
+        const conversation = await this.conversationService.findConversationById(id);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket = this.sessions.getUserSocket(recipient.id);
+        const creatorSocket = this.sessions.getUserSocket(creator.id);
+        if (recipientSocket) recipientSocket.emit('onChangeConversationNickname', payload);
+        if (creatorSocket) creatorSocket.emit('onChangeConversationNickname', payload);
+    }
+
+    @OnEvent('group.nickname.change')
+    async changeGroupNickname(payload: Group) {
+        console.log('inside group.emoji.change');
+        const { id } = payload;
+        this.server.to(`group-${id}`).emit('onChangeGroupNickname', payload);
     }
 }

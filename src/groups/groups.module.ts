@@ -3,7 +3,7 @@ import { GroupsController } from './controllers/groups.controller';
 import { GroupsService } from './services/groups.service';
 import { Services } from '../utils/constants';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Group, GroupMessage, User } from '../utils/typeorm';
+import { Group, GroupMessage, GroupNickname, User } from '../utils/typeorm';
 import { UsersModule } from '../users/users.module';
 import { GroupMessagesService } from './services/group-messages.service';
 import { GroupMessagesController } from './controllers/group-messages.controller';
@@ -15,7 +15,12 @@ import { StorageModule } from 'src/storage/storage.module';
 import { AttachmentsModule } from 'src/attachments/attachments.module';
 
 @Module({
-    imports: [UsersModule, TypeOrmModule.forFeature([Group, GroupMessage, User]), StorageModule, AttachmentsModule],
+    imports: [
+        UsersModule,
+        TypeOrmModule.forFeature([Group, GroupMessage, User, GroupNickname]),
+        StorageModule,
+        AttachmentsModule,
+    ],
     controllers: [GroupsController, GroupMessagesController, GroupRecipientsController],
     providers: [
         {

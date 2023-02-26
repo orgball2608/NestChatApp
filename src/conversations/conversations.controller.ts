@@ -7,6 +7,7 @@ import { IConversationsService } from './conversations';
 import { CreateConversationDto } from './dtos/CreateConversation.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChangeEmojiIconDto } from './dtos/ChangeEmojiIcon.dto';
+import { ChangeNicknameDto } from './dtos/ChangeNickname.dto';
 
 @Controller(Routes.CONVERSATIONS)
 @UseGuards(AuthenticatedGuard)
@@ -41,6 +42,17 @@ export class ConversationsController {
             emoji,
         });
         this.eventEmitter.emit('conversation.emoji.change', conversation);
+        return conversation;
+    }
+
+    @Post(':id/nickname')
+    async changeNickname(@Param('id') id: number, @Body() { nickname, email }: ChangeNicknameDto) {
+        const conversation = await this.conversationsService.changeNickname({
+            conversationId: id,
+            email,
+            nickname,
+        });
+        this.eventEmitter.emit('conversation.nickname.change', conversation);
         return conversation;
     }
 }
