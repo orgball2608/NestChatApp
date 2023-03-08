@@ -7,6 +7,7 @@ import {
     CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
+    ForwardMessageParams,
     getConversationMessagesParams,
     SearchMessagesByContentParams,
 } from '../utils/types';
@@ -35,4 +36,8 @@ export interface IMessageService {
     getMessagesLengthByConversationId(conversationId: number): Promise<number>;
 
     searchMessagesByContent(params: SearchMessagesByContentParams): Promise<Message[]>;
+
+    forwardConversationMessage(params: ForwardMessageParams);
+
+    forwardGroupMessage(params: ForwardMessageParams);
 }

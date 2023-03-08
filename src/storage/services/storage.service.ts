@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Services } from '../../utils/constants';
 import { IStorage } from '../storage';
 import { S3 } from 'aws-sdk';
-import { uploadAttachmentParams, UploadImageParams } from '../../utils/types';
+import { CopyAttachmentParams, uploadAttachmentParams, UploadImageParams } from '../../utils/types';
 import * as process from 'process';
 import { Attachment } from 'src/utils/typeorm';
 import { compressImage } from 'src/utils/helpers';
@@ -75,5 +75,36 @@ export class StorageService implements IStorage {
         };
         await this.spacesClient.putObject(uploadOriginalParams).promise();
         return attachment;
+    }
+
+    async copyAttachment(params: CopyAttachmentParams): Promise<Attachment> {
+        const { attachment, key, newAttachment } = params;
+        const uploadOriginalParams = {
+            Bucket: process.env.AWS_PUBLIC_BUCKET_KEY,
+            CopySource: `${process.env.AWS_PUBLIC_BUCKET_KEY}/orginal/${attachment.key}`,
+            Key: `orginal/${key}`,
+            ACL: 'public-read',
+        };
+        const uploadPreviewParams = {
+            Bucket: process.env.AWS_PUBLIC_BUCKET_KEY,
+            CopySource: `${process.env.AWS_PUBLIC_BUCKET_KEY}/preview/${attachment.key}`,
+            Key: `preview/${key}`,
+            ACL: 'public-read',
+        };
+        await this.spacesClient.copyObject(uploadOriginalParams).promise();
+        await this.spacesClient.copyObject(uploadPreviewParams).promise();
+        return newAttachment;
+    }
+
+    async copyFileAttachment(params: CopyAttachmentParams): Promise<Attachment> {
+        const { attachment, key, newAttachment } = params;
+        const uploadParams = {
+            Bucket: process.env.AWS_PUBLIC_BUCKET_KEY,
+            CopySource: `${process.env.AWS_PUBLIC_BUCKET_KEY}/${attachment.key}`,
+            Key: `${key}`,
+            ACL: 'public-read',
+        };
+        await this.spacesClient.copyObject(uploadParams).promise();
+        return newAttachment;
     }
 }

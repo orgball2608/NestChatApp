@@ -3,11 +3,10 @@ import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
 import { Services } from '../utils/constants';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Conversation, Message } from '../utils/typeorm';
+import { Conversation, Group, GroupMessage, Message } from '../utils/typeorm';
 import { AttachmentsModule } from 'src/attachments/attachments.module';
-
 @Module({
-    imports: [TypeOrmModule.forFeature([Message, Conversation]), AttachmentsModule],
+    imports: [TypeOrmModule.forFeature([Message, Conversation, GroupMessage, Group]), AttachmentsModule],
     providers: [
         {
             provide: Services.MESSAGES,

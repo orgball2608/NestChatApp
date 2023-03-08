@@ -357,3 +357,15 @@ export type ChangeGroupNicknameParams = {
     nickname: string;
     authorId: number;
 };
+
+export type ForwardMessageParams = {
+    author: User;
+    id: number;
+    messageId: number;
+};
+
+export type CopyAttachmentParams = {
+    key: string;
+    attachment: Attachment;
+    newAttachment: Attachment;
+};

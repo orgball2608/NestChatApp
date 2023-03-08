@@ -61,4 +61,70 @@ export class AttachmentsService implements IAttachmentService {
             return Promise.all(promise);
         }
     }
+
+    copyAttachments(attachments: GroupAttachment[] | Attachment[]): Promise<Attachment[]> {
+        const type = attachments[0].type;
+        if (type === 'image') {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.attachRepository.create();
+                newAttachment.type = 'image';
+                newAttachment.name = a.name;
+                newAttachment.size = a.size;
+                const attachment = await this.attachRepository.save(newAttachment);
+                return this.imageUploadService.copyAttachment({
+                    attachment: a,
+                    key: attachment.key,
+                    newAttachment: attachment,
+                });
+            });
+            return Promise.all(promise);
+        } else {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.attachRepository.create();
+                newAttachment.type = 'file';
+                newAttachment.name = a.name;
+                newAttachment.size = a.size;
+                const attachment = await this.attachRepository.save(newAttachment);
+                return this.imageUploadService.copyFileAttachment({
+                    attachment: a,
+                    key: attachment.key,
+                    newAttachment: attachment,
+                });
+            });
+            return Promise.all(promise);
+        }
+    }
+
+    copyGroupAttachments(attachments: GroupAttachment[] | Attachment[]): Promise<GroupAttachment[]> {
+        const type = attachments[0].type;
+        if (type === 'image') {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.groupAttachRepository.create();
+                newAttachment.type = 'image';
+                newAttachment.name = a.name;
+                newAttachment.size = a.size;
+                const attachment = await this.groupAttachRepository.save(newAttachment);
+                return this.imageUploadService.copyAttachment({
+                    attachment: a,
+                    key: attachment.key,
+                    newAttachment: attachment,
+                });
+            });
+            return Promise.all(promise);
+        } else {
+            const promise = attachments.map(async (a) => {
+                const newAttachment = this.groupAttachRepository.create();
+                newAttachment.type = 'file';
+                newAttachment.name = a.name;
+                newAttachment.size = a.size;
+                const attachment = await this.groupAttachRepository.save(newAttachment);
+                return this.imageUploadService.copyFileAttachment({
+                    attachment: a,
+                    key: attachment.key,
+                    newAttachment: attachment,
+                });
+            });
+            return Promise.all(promise);
+        }
+    }
 }

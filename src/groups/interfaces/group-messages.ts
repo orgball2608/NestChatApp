@@ -7,6 +7,7 @@ import {
     CreateReplyGroupMessageParams,
     DeleteGroupMessageParams,
     EditGroupMessageParams,
+    ForwardMessageParams,
     getGroupMessagesParams,
     getGroupMessagesWithLimitParams,
 } from '../../utils/types';
@@ -23,4 +24,6 @@ export interface IGroupMessageService {
     createGroupStickerMessage(params: CreateGroupStickerMessageParams): Promise<CreateGroupMessageResponse>;
     createReplyGroupMessage(params: CreateReplyGroupMessageParams): Promise<CreateGroupMessageResponse>;
     getGroupMessagesLength(id: number): Promise<number>;
+    forwardConversationMessage(params: ForwardMessageParams);
+    forwardGroupMessage(params: ForwardMessageParams);
 }

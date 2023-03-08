@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { IAttachmentService } from '../attachments/attachments';
 import { Services } from '../utils/constants';
 import { Repository } from 'typeorm';
-import { Conversation, Message } from '../utils/typeorm';
+import { Conversation, Group, GroupMessage, Message } from '../utils/typeorm';
 import {
     CreateGifMessageParams,
     CreateMessageParams,
@@ -13,15 +13,21 @@ import {
     CreateStickerMessageParams,
     DeleteMessageParams,
     EditMessageParams,
+    ForwardMessageParams,
     getConversationMessagesParams,
     SearchMessagesByContentParams,
 } from '../utils/types';
 import { IMessageService } from './messages';
+import { GroupNotFoundException } from 'src/groups/exceptions/GroupNotFoundException';
 @Injectable()
 export class MessagesService implements IMessageService {
     constructor(
         @InjectRepository(Message)
         private readonly messageRepository: Repository<Message>,
+        @InjectRepository(GroupMessage)
+        private readonly groupMessageRepository: Repository<GroupMessage>,
+        @InjectRepository(Group)
+        private readonly groupRepository: Repository<Group>,
         @InjectRepository(Conversation)
         private readonly conversationRepository: Repository<Conversation>,
         @Inject(Services.ATTACHMENTS) private readonly attachmentsService: IAttachmentService,
@@ -30,7 +36,16 @@ export class MessagesService implements IMessageService {
     async createMessage({ user, content, conversationId, attachments, type }: CreateMessageParams) {
         const conversation = await this.conversationRepository.findOne({
             where: { id: conversationId },
-            relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
+            relations: [
+                'creator',
+                'recipient',
+                'lastMessageSent',
+                'creator.profile',
+                'recipient.profile',
+                'nicknames',
+                'nicknames.user',
+                'nicknames.user.profile',
+            ],
         });
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
@@ -91,12 +106,13 @@ export class MessagesService implements IMessageService {
                 'reply.author',
                 'reply.author.profile',
                 'reply.attachments',
+                'conversation',
             ],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
+            withDeleted: true,
             take: limit,
             skip: offset,
-            withDeleted: true,
         });
     }
 
@@ -195,7 +211,16 @@ export class MessagesService implements IMessageService {
         const { user, gif, conversationId } = params;
         const conversation = await this.conversationRepository.findOne({
             where: { id: conversationId },
-            relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
+            relations: [
+                'creator',
+                'recipient',
+                'lastMessageSent',
+                'creator.profile',
+                'recipient.profile',
+                'nicknames',
+                'nicknames.user',
+                'nicknames.user.profile',
+            ],
         });
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
@@ -220,7 +245,16 @@ export class MessagesService implements IMessageService {
         const { user, sticker, conversationId } = params;
         const conversation = await this.conversationRepository.findOne({
             where: { id: conversationId },
-            relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
+            relations: [
+                'creator',
+                'recipient',
+                'lastMessageSent',
+                'creator.profile',
+                'recipient.profile',
+                'nicknames',
+                'nicknames.user',
+                'nicknames.user.profile',
+            ],
         });
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
@@ -245,7 +279,16 @@ export class MessagesService implements IMessageService {
         const { user, content, conversationId, messageId } = params;
         const conversation = await this.conversationRepository.findOne({
             where: { id: conversationId },
-            relations: ['creator', 'recipient', 'lastMessageSent', 'creator.profile', 'recipient.profile'],
+            relations: [
+                'creator',
+                'recipient',
+                'lastMessageSent',
+                'creator.profile',
+                'recipient.profile',
+                'nicknames',
+                'nicknames.user',
+                'nicknames.user.profile',
+            ],
         });
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
@@ -292,5 +335,87 @@ export class MessagesService implements IMessageService {
             .andWhere('message.content LIKE :content', { content: `%${content}%` })
             .orderBy('message.createdAt', 'DESC')
             .getMany();
+    }
+
+    async forwardConversationMessage(params: ForwardMessageParams) {
+        const { id, messageId, author } = params;
+        const conversation = await this.conversationRepository.findOne({
+            where: { id },
+            relations: [
+                'creator',
+                'recipient',
+                'lastMessageSent',
+                'creator.profile',
+                'recipient.profile',
+                'nicknames',
+                'nicknames.user',
+                'nicknames.user.profile',
+            ],
+        });
+        if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
+
+        const forwardedMessage = await this.getMessageById(messageId);
+        if (!forwardedMessage) throw new HttpException('Message not found', HttpStatus.BAD_REQUEST);
+
+        const newAttachments =
+            forwardedMessage.attachments.length === 0
+                ? []
+                : await this.attachmentsService.copyAttachments(forwardedMessage.attachments);
+        console.log(newAttachments);
+
+        const message = this.messageRepository.create({
+            content: forwardedMessage?.content,
+            author: author,
+            gif: forwardedMessage?.gif,
+            sticker: forwardedMessage?.sticker,
+            conversation: conversation,
+            attachments: newAttachments,
+        });
+        const savedMessage = await this.messageRepository.save(message);
+        conversation.lastMessageSent = savedMessage;
+        const updatedConversation = await this.conversationRepository.save(conversation);
+        return { message: savedMessage, conversation: updatedConversation };
+    }
+
+    async forwardGroupMessage(params: ForwardMessageParams) {
+        const { id, messageId, author } = params;
+        const group = await this.groupRepository.findOne({
+            where: {
+                id,
+            },
+            relations: [
+                'creator',
+                'users',
+                'lastMessageSent',
+                'owner',
+                'creator.profile',
+                'owner.profile',
+                'users.profile',
+                'nicknames',
+                'nicknames.user',
+            ],
+        });
+        if (!group) throw new GroupNotFoundException();
+
+        const forwardedMessage = await this.getMessageById(messageId);
+        if (!forwardedMessage) throw new HttpException('Message not found', HttpStatus.BAD_REQUEST);
+
+        const newAttachments =
+            forwardedMessage.attachments.length === 0
+                ? []
+                : await this.attachmentsService.copyGroupAttachments(forwardedMessage.attachments);
+
+        const message = this.groupMessageRepository.create({
+            content: forwardedMessage?.content,
+            author: author,
+            gif: forwardedMessage?.gif,
+            sticker: forwardedMessage?.sticker,
+            group: group,
+            attachments: newAttachments,
+        });
+        const savedMessage = await this.groupMessageRepository.save(message);
+        group.lastMessageSent = savedMessage;
+        const updatedGroup = await this.groupRepository.save(group);
+        return { message: savedMessage, group: updatedGroup };
     }
 }

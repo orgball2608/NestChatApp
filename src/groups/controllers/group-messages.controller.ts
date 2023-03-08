@@ -57,6 +57,36 @@ export class GroupMessagesController {
         return;
     }
 
+    //forward group message to conversation by forwardId
+    @Post(':messageId/forward/conversation/:forwardId')
+    async createConversationForWardMessage(
+        @AuthUser() user: User,
+        @Param('forwardId', ParseIntPipe)
+        forwardId: number,
+        @Param('messageId', ParseIntPipe)
+        messageId: number,
+    ) {
+        const params = { id: forwardId, messageId, author: user };
+        const response = await this.groupMessageService.forwardConversationMessage(params);
+        this.eventEmitter.emit('message.create', response);
+        return response;
+    }
+
+    //forward group message to group by forwardId
+    @Post(':messageId/forward/group/:forwardId')
+    async createGroupForWardMessage(
+        @AuthUser() user: User,
+        @Param('forwardId', ParseIntPipe)
+        forwardId: number,
+        @Param('messageId', ParseIntPipe)
+        messageId: number,
+    ) {
+        const params = { id: forwardId, messageId, author: user };
+        const response = await this.groupMessageService.forwardGroupMessage(params);
+        this.eventEmitter.emit('group.message.create', response);
+        return response;
+    }
+
     @Get()
     async getGroupMessages(
         @AuthUser() user: User,
