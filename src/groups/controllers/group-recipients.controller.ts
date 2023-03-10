@@ -59,7 +59,7 @@ export class GroupRecipientsController {
         return response;
     }
 
-    @Patch()
+    @Patch('leave')
     async leaveGroup(@AuthUser() user: User, @Param('id', ParseIntPipe) groupId: number) {
         const response = await this.groupRecipientService.leaveGroup({
             userId: user.id,

@@ -5,6 +5,7 @@ import {
     AddGroupRecipientsParams,
     AddGroupRecipientsResponse,
     CheckUserInGroupParams,
+    leaveGroupResponse,
     RemoveGroupRecipientParams,
 } from '../../utils/types';
 import { IGroupService } from '../interfaces/groups';
@@ -78,13 +79,13 @@ export class GroupRecipientsService implements IGroupRecipientService {
         return group;
     }
 
-    async leaveGroup(params: CheckUserInGroupParams): Promise<Group> {
+    async leaveGroup(params: CheckUserInGroupParams): Promise<leaveGroupResponse> {
         const { userId, groupId } = params;
         const group = await this.groupService.getGroupById({ id: groupId, userId });
         if (!group) throw new GroupNotFoundException();
         if (group.owner.id === userId) throw new HttpException('Cannot leave group as owner', HttpStatus.BAD_REQUEST);
         group.users = group.users.filter((user) => user.id !== userId);
         const savedGroup = await this.groupService.saveGroup(group);
-        return savedGroup;
+        return { savedGroup,userId};
     }
 }

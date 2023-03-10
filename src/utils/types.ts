@@ -369,3 +369,8 @@ export type CopyAttachmentParams = {
     attachment: Attachment;
     newAttachment: Attachment;
 };
+
+export type leaveGroupResponse = {
+    savedGroup: Group;
+    userId: number;
+};

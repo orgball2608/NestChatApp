@@ -21,6 +21,7 @@ import {
     CreateReactGroupMessagePayload,
     CreateReactMessagePayload,
     DeleteMessageParams,
+    leaveGroupResponse,
     RemoveFriendEventPayload,
     RemoveReactMessagePayload,
 } from '../utils/types';
@@ -264,9 +265,12 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
 
     @OnEvent('group.user.leave')
-    handleLeaveGroup(payload) {
-        const { id } = payload;
-        this.server.to(`group-${id}`).emit('onGroupLeave', payload);
+    handleLeaveGroup(payload:leaveGroupResponse) {
+        const { savedGroup,userId } = payload;
+        const socket = this.sessions.getUserSocket(userId);
+        socket && socket.emit('onLeaveGroup', payload);
+        socket && socket.leave(`group-${savedGroup.id}`);
+        this.server.to(`group-${savedGroup.id}`).emit('onGroupUserLeave', payload);
     }
 
     @SubscribeMessage('getOnlineFriends')

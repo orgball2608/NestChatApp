@@ -100,6 +100,8 @@ export class GroupsService implements IGroupService {
                 'creator.profile',
                 'owner.profile',
                 'users.profile',
+                'nicknames',
+                'nicknames.user',
             ],
         });
         if (!group) return;
