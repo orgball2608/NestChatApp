@@ -8,6 +8,7 @@ import { CreateConversationDto } from './dtos/CreateConversation.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChangeEmojiIconDto } from './dtos/ChangeEmojiIcon.dto';
 import { ChangeNicknameDto } from './dtos/ChangeNickname.dto';
+import { ChangeThemeDto } from './dtos/ChangeTheme.dto';
 
 @Controller(Routes.CONVERSATIONS)
 @UseGuards(AuthenticatedGuard)
@@ -53,6 +54,16 @@ export class ConversationsController {
             nickname,
         });
         this.eventEmitter.emit('conversation.nickname.change', conversation);
+        return conversation;
+    }
+
+    @Post(':id/theme')
+    async changeTheme(@Param('id') id: number, @Body() { theme }: ChangeThemeDto) {
+        const conversation = await this.conversationsService.changeConversationTheme({
+            id,
+            theme,
+        });
+        this.eventEmitter.emit('conversation.theme.change', conversation);
         return conversation;
     }
 }

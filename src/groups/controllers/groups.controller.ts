@@ -25,6 +25,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { userInfo } from 'os';
 import { ChangeGroupEmojiDto } from '../dtos/ChangeGroupEmoji.dto';
 import { ChangeGroupNicknameDto } from '../dtos/ChangeGroupNickname.dto';
+import { ChangeGroupThemeDto } from '../dtos/ChangeGroupTheme.dto';
 
 @Controller(Routes.GROUPS)
 export class GroupsController {
@@ -139,6 +140,21 @@ export class GroupsController {
             email,
         });
         this.eventEmitter.emit('group.nickname.change', group);
+        return group;
+    }
+
+    @Post(':id/theme')
+    async changeGroupTheme(
+        @AuthUser() user: User,
+        @Param('id', ParseIntPipe) id: number,
+        @Body() { theme }: ChangeGroupThemeDto,
+    ) {
+        const group = await this.groupServices.changeGroupTheme({
+            groupId: id,
+            userId: user.id,
+            theme,
+        });
+        this.eventEmitter.emit('group.theme.change', group);
         return group;
     }
 }

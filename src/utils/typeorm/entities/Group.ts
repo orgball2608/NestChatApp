@@ -59,4 +59,7 @@ export class Group {
     @OneToMany(() => GroupNickname, (groupNickname) => groupNickname.group)
     @JoinColumn()
     nicknames: GroupNickname[];
+
+    @Column({ nullable: true, default: '#0D90F3' })
+    theme?: string;
 }

@@ -418,4 +418,24 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const { id } = payload;
         this.server.to(`group-${id}`).emit('onChangeGroupNickname', payload);
     }
+
+    @OnEvent('conversation.theme.change')
+    async changeConversationTheme(payload: Conversation) {
+        console.log('inside conversation.theme.change');
+        const { id } = payload;
+        const conversation = await this.conversationService.findConversationById(id);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket = this.sessions.getUserSocket(recipient.id);
+        const creatorSocket = this.sessions.getUserSocket(creator.id);
+        if (recipientSocket) recipientSocket.emit('onChangeConversationTheme', conversation);
+        if (creatorSocket) creatorSocket.emit('onChangeConversationTheme', conversation);
+    }
+
+    @OnEvent('group.theme.change')
+    async changeGroupTheme(payload: Group) {
+        console.log('inside group.theme.change');
+        const { id } = payload;
+        this.server.to(`group-${id}`).emit('onChangeGroupTheme', payload);
+    }
 }

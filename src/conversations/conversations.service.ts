@@ -7,6 +7,7 @@ import { Conversation, ConversationNickname, User } from '../utils/typeorm';
 import {
     AccessParams,
     ChangeConversationNicknameParams,
+    ChangeConversationThemeParams,
     ChangeEmojiIconParams,
     CreateConversationParams,
 } from '../utils/types';
@@ -123,6 +124,14 @@ export class ConversationsService implements IConversationsService {
             this.nicknameRepository.save(newNickname);
             conversation.nicknames.push(newNickname);
         }
+        return this.conversationRepository.save(conversation);
+    }
+
+    async changeConversationTheme(params: ChangeConversationThemeParams): Promise<Conversation> {
+        const { id, theme } = params;
+        const conversation = await this.findConversationById(id);
+        if (!conversation) throw new ConversationNotFoundException();
+        conversation.theme = theme;
         return this.conversationRepository.save(conversation);
     }
 }

@@ -374,3 +374,15 @@ export type leaveGroupResponse = {
     savedGroup: Group;
     userId: number;
 };
+
+export type ChangeConversationThemeParams = {
+    id: number;
+    theme: string;
+};
+
+export type ChangeGroupThemeParams = {
+    groupId: number;
+    theme: string;
+    userId: number;
+};
+

@@ -8,6 +8,7 @@ import {
     ChangeEmojiIconParams,
     ChangeGroupEmojiIconParams,
     ChangeGroupNicknameParams,
+    ChangeGroupThemeParams,
     changeOwnerParams,
     CreateGroupParams,
     EditGroupTitleParams,
@@ -200,6 +201,14 @@ export class GroupsService implements IGroupService {
             this.groupNicknameRepository.save(newNickname);
             group.nicknames.push(newNickname);
         }
+        return this.groupRepository.save(group);
+    }
+
+    async changeGroupTheme(params: ChangeGroupThemeParams): Promise<Group> {
+        const { groupId, userId, theme } = params;
+        const group = await this.getGroupById({ id: groupId, userId });
+        if (!group) throw new GroupNotFoundException();
+        group.theme = theme;
         return this.groupRepository.save(group);
     }
 }

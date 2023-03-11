@@ -2,6 +2,7 @@ import { Conversation, User } from '../utils/typeorm';
 import {
     AccessParams,
     ChangeConversationNicknameParams,
+    ChangeConversationThemeParams,
     ChangeEmojiIconParams,
     CreateConversationParams,
 } from '../utils/types';
@@ -13,4 +14,5 @@ export interface IConversationsService {
     hasAccess({ id, userId }: AccessParams);
     changeEmojiIcon(params: ChangeEmojiIconParams): Promise<Conversation>;
     changeNickname(params: ChangeConversationNicknameParams): Promise<Conversation>;
+    changeConversationTheme(params: ChangeConversationThemeParams): Promise<Conversation>;
 }

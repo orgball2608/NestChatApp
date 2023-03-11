@@ -49,4 +49,7 @@ export class Conversation {
     @OneToMany(() => ConversationNickname, (conversationNickname) => conversationNickname.conversation)
     @JoinColumn()
     nicknames: ConversationNickname[];
+
+    @Column({ nullable: true, default: '#0D90F3' })
+    theme?: string;
 }
