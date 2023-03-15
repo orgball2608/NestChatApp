@@ -40,4 +40,6 @@ export interface IMessageService {
     forwardConversationMessage(params: ForwardMessageParams);
 
     forwardGroupMessage(params: ForwardMessageParams);
+
+    getMessageAttachments(conversationId: number);
 }

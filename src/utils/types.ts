@@ -386,3 +386,7 @@ export type ChangeGroupThemeParams = {
     userId: number;
 };
 
+export type GetGroupAttachmentsParams = {
+    author: User;
+    id: number;
+};

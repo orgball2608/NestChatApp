@@ -19,6 +19,7 @@ import {
 } from '../utils/types';
 import { IMessageService } from './messages';
 import { GroupNotFoundException } from 'src/groups/exceptions/GroupNotFoundException';
+
 @Injectable()
 export class MessagesService implements IMessageService {
     constructor(
@@ -417,5 +418,11 @@ export class MessagesService implements IMessageService {
         group.lastMessageSent = savedMessage;
         const updatedGroup = await this.groupRepository.save(group);
         return { message: savedMessage, group: updatedGroup };
+    }
+
+    async getMessageAttachments(conversationId: number) {
+        const messages = await this.getMessagesByConversationId(conversationId);
+        const conversationAttachments = messages.map((message) => message.attachments);
+        return conversationAttachments.filter((attachment) => attachment.length !== 0);
     }
 }

@@ -15,6 +15,8 @@ import { StorageModule } from 'src/storage/storage.module';
 import { AttachmentsModule } from 'src/attachments/attachments.module';
 import { MessagesModule } from 'src/messages/messages.module';
 import { ConversationsModule } from 'src/conversations/conversations.module';
+import { GroupAttachmentService } from './services/group-attachments.service';
+import { GroupAttachmentsController } from './controllers/group-attachments.controller';
 
 @Module({
     imports: [
@@ -25,7 +27,7 @@ import { ConversationsModule } from 'src/conversations/conversations.module';
         MessagesModule,
         ConversationsModule,
     ],
-    controllers: [GroupsController, GroupMessagesController, GroupRecipientsController],
+    controllers: [GroupsController, GroupMessagesController, GroupRecipientsController, GroupAttachmentsController],
     providers: [
         {
             provide: Services.GROUPS,
@@ -38,6 +40,10 @@ import { ConversationsModule } from 'src/conversations/conversations.module';
         {
             provide: Services.GROUP_RECIPIENTS,
             useClass: GroupRecipientsService,
+        },
+        {
+            provide: Services.GROUP_ATTACHMENTS,
+            useClass: GroupAttachmentService,
         },
     ],
     exports: [

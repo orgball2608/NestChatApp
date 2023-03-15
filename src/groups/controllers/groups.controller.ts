@@ -22,7 +22,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EditGroupTitleDto } from '../dtos/EditGroupTitle.dto';
 import { TransferOwnerDto } from '../dtos/TransferOwner.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { userInfo } from 'os';
 import { ChangeGroupEmojiDto } from '../dtos/ChangeGroupEmoji.dto';
 import { ChangeGroupNicknameDto } from '../dtos/ChangeGroupNickname.dto';
 import { ChangeGroupThemeDto } from '../dtos/ChangeGroupTheme.dto';

@@ -194,4 +194,9 @@ export class MessagesController {
             content,
         });
     }
+
+    @Get('attachments')
+    async getGroupAttachments(@Param('id', ParseIntPipe) id: number) {
+        return await this.messageService.getMessageAttachments(id);
+    }
 }

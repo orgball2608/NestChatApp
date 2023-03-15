@@ -5,7 +5,6 @@ import { Group, GroupNickname, User } from '../../utils/typeorm';
 import { Repository } from 'typeorm';
 import {
     AccessParams,
-    ChangeEmojiIconParams,
     ChangeGroupEmojiIconParams,
     ChangeGroupNicknameParams,
     ChangeGroupThemeParams,
