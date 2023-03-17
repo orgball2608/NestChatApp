@@ -3,6 +3,7 @@ import { BaseMessage } from './BaseMessage';
 import { Group } from './Group';
 import { GroupAttachment } from './GroupAttachments';
 import { ReactGroupMessage } from './ReactGroupMessage';
+import { GroupMessageStatus } from './GroupMessageStatus';
 
 @Entity({ name: 'group_messages' })
 export class GroupMessage extends BaseMessage {
@@ -20,4 +21,7 @@ export class GroupMessage extends BaseMessage {
     @OneToMany(() => ReactGroupMessage, (react) => react.message)
     @JoinColumn()
     reacts: ReactGroupMessage[];
+
+    @OneToMany(() => GroupMessageStatus, (groupMessageStatus) => groupMessageStatus.message)
+    messageStatuses?: GroupMessageStatus[];
 }

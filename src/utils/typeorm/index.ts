@@ -13,6 +13,8 @@ import { ReactMessage } from './entities/ReactMessage';
 import { ReactGroupMessage } from './entities/ReactGroupMessage';
 import { ConversationNickname } from './entities/ConversationNickname';
 import { GroupNickname } from './entities/GroupNickname';
+import { MessageStatus } from './entities/MessageStatus';
+import { GroupMessageStatus } from './entities/GroupMessageStatus';
 
 const entities = [
     User,
@@ -30,6 +32,8 @@ const entities = [
     ReactGroupMessage,
     ConversationNickname,
     GroupNickname,
+    MessageStatus,
+    GroupMessageStatus,
 ];
 
 export default entities;
@@ -50,4 +54,6 @@ export {
     ReactGroupMessage,
     ConversationNickname,
     GroupNickname,
+    MessageStatus,
+    GroupMessageStatus,
 };

@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
-import { IAttachmentService } from '../attachments/attachments';
-import { Services } from '../utils/constants';
+import { IAttachmentService } from '../../attachments/attachments';
+import { Services } from '../../utils/constants';
 import { Repository } from 'typeorm';
-import { Conversation, Group, GroupMessage, Message } from '../utils/typeorm';
+import { Conversation, Group, GroupMessage, Message } from '../../utils/typeorm';
 import {
     CreateGifMessageParams,
     CreateMessageParams,
@@ -16,9 +16,10 @@ import {
     ForwardMessageParams,
     getConversationMessagesParams,
     SearchMessagesByContentParams,
-} from '../utils/types';
-import { IMessageService } from './messages';
+} from '../../utils/types';
+import { IMessageService } from '../interfaces/messages';
 import { GroupNotFoundException } from 'src/groups/exceptions/GroupNotFoundException';
+import { IConversationsService } from '../../conversations/conversations';
 
 @Injectable()
 export class MessagesService implements IMessageService {
@@ -32,22 +33,11 @@ export class MessagesService implements IMessageService {
         @InjectRepository(Conversation)
         private readonly conversationRepository: Repository<Conversation>,
         @Inject(Services.ATTACHMENTS) private readonly attachmentsService: IAttachmentService,
+        @Inject(Services.CONVERSATIONS) private readonly conversationService: IConversationsService,
     ) {}
 
     async createMessage({ user, content, conversationId, attachments, type }: CreateMessageParams) {
-        const conversation = await this.conversationRepository.findOne({
-            where: { id: conversationId },
-            relations: [
-                'creator',
-                'recipient',
-                'lastMessageSent',
-                'creator.profile',
-                'recipient.profile',
-                'nicknames',
-                'nicknames.user',
-                'nicknames.user.profile',
-            ],
-        });
+        const conversation = await this.conversationService.findConversationById(conversationId);
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
         const { creator, recipient } = conversation;
@@ -82,6 +72,8 @@ export class MessagesService implements IMessageService {
                 'reply.author',
                 'reply.author.profile',
                 'reply.attachments',
+                'messageStatuses',
+                'messageStatuses.user',
             ],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
@@ -108,6 +100,8 @@ export class MessagesService implements IMessageService {
                 'reply.author.profile',
                 'reply.attachments',
                 'conversation',
+                'messageStatuses',
+                'messageStatuses.user',
             ],
             where: { conversation: { id: conversationId } },
             order: { createdAt: 'DESC' },
@@ -122,6 +116,8 @@ export class MessagesService implements IMessageService {
             .createQueryBuilder('conversation')
             .where('id = :conversationId', { conversationId: params.conversationId })
             .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
+            .leftJoinAndSelect('lastMessageSent.messageStatuses', 'status')
+            .leftJoinAndSelect('status.user', 'seenBy')
             .leftJoinAndSelect('conversation.messages', 'message')
             .where('conversation.id = :conversationId', {
                 conversationId: params.conversationId,
@@ -200,6 +196,8 @@ export class MessagesService implements IMessageService {
                 'reply.author',
                 'reply.author.profile',
                 'reply.attachments',
+                'messageStatuses',
+                'messageStatuses.user',
             ],
         });
     }
@@ -210,19 +208,7 @@ export class MessagesService implements IMessageService {
 
     async createGifMessage(params: CreateGifMessageParams): Promise<CreateMessageResponse> {
         const { user, gif, conversationId } = params;
-        const conversation = await this.conversationRepository.findOne({
-            where: { id: conversationId },
-            relations: [
-                'creator',
-                'recipient',
-                'lastMessageSent',
-                'creator.profile',
-                'recipient.profile',
-                'nicknames',
-                'nicknames.user',
-                'nicknames.user.profile',
-            ],
-        });
+        const conversation = await this.conversationService.findConversationById(conversationId);
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
         const { creator, recipient } = conversation;
@@ -244,19 +230,7 @@ export class MessagesService implements IMessageService {
 
     async createStickerMessage(params: CreateStickerMessageParams): Promise<CreateMessageResponse> {
         const { user, sticker, conversationId } = params;
-        const conversation = await this.conversationRepository.findOne({
-            where: { id: conversationId },
-            relations: [
-                'creator',
-                'recipient',
-                'lastMessageSent',
-                'creator.profile',
-                'recipient.profile',
-                'nicknames',
-                'nicknames.user',
-                'nicknames.user.profile',
-            ],
-        });
+        const conversation = await this.conversationService.findConversationById(conversationId);
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
         const { creator, recipient } = conversation;
@@ -278,19 +252,7 @@ export class MessagesService implements IMessageService {
 
     async createReplyMessage(params: CreateReplyMessageParams): Promise<CreateMessageResponse> {
         const { user, content, conversationId, messageId } = params;
-        const conversation = await this.conversationRepository.findOne({
-            where: { id: conversationId },
-            relations: [
-                'creator',
-                'recipient',
-                'lastMessageSent',
-                'creator.profile',
-                'recipient.profile',
-                'nicknames',
-                'nicknames.user',
-                'nicknames.user.profile',
-            ],
-        });
+        const conversation = await this.conversationService.findConversationById(conversationId);
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
         const replyMessage = await this.messageRepository.findOne({
@@ -340,19 +302,7 @@ export class MessagesService implements IMessageService {
 
     async forwardConversationMessage(params: ForwardMessageParams) {
         const { id, messageId, author } = params;
-        const conversation = await this.conversationRepository.findOne({
-            where: { id },
-            relations: [
-                'creator',
-                'recipient',
-                'lastMessageSent',
-                'creator.profile',
-                'recipient.profile',
-                'nicknames',
-                'nicknames.user',
-                'nicknames.user.profile',
-            ],
-        });
+        const conversation = await this.conversationService.findConversationById(id);
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
         const forwardedMessage = await this.getMessageById(messageId);
@@ -362,7 +312,6 @@ export class MessagesService implements IMessageService {
             forwardedMessage.attachments.length === 0
                 ? []
                 : await this.attachmentsService.copyAttachments(forwardedMessage.attachments);
-        console.log(newAttachments);
 
         const message = this.messageRepository.create({
             content: forwardedMessage?.content,
@@ -388,6 +337,8 @@ export class MessagesService implements IMessageService {
                 'creator',
                 'users',
                 'lastMessageSent',
+                'lastMessageSent.messageStatuses',
+                'lastMessageSent.messageStatuses.user',
                 'owner',
                 'creator.profile',
                 'owner.profile',

@@ -43,11 +43,11 @@ export class Group {
     @CreateDateColumn({ name: 'created_at' })
     createdAt: number;
 
-    @OneToOne(() => GroupMessage,{createForeignKeyConstraints: false})
-    @JoinColumn({ name: 'last_message_sent', })
+    @OneToOne(() => GroupMessage, { createForeignKeyConstraints: false })
+    @JoinColumn({ name: 'last_message_sent' })
     lastMessageSent: GroupMessage;
 
-    @UpdateDateColumn({ name: 'updated_at'})
+    @UpdateDateColumn({ name: 'updated_at' })
     lastMessageSentAt: Date;
 
     @Column({ nullable: true })

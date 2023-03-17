@@ -1,4 +1,4 @@
-import { Message } from '../utils/typeorm';
+import { Message } from '../../utils/typeorm';
 import {
     CreateGifMessageParams,
     CreateMessageParams,
@@ -10,7 +10,7 @@ import {
     ForwardMessageParams,
     getConversationMessagesParams,
     SearchMessagesByContentParams,
-} from '../utils/types';
+} from '../../utils/types';
 
 export interface IMessageService {
     createMessage(params: CreateMessageParams): Promise<CreateMessageResponse>;

@@ -31,6 +31,7 @@ export class GroupsService implements IGroupService {
         @Inject(Services.USERS) private readonly userService: IUserService,
         @Inject(Services.IMAGE_UPLOAD_SERVICE) private readonly imageUploadService,
     ) {}
+
     async createGroup(params: CreateGroupParams) {
         const { title, creator } = params;
         const usersPromise = params.users.map((email) => this.userService.findUser({ email }, { selectAll: false }));
@@ -47,6 +48,8 @@ export class GroupsService implements IGroupService {
             .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
             .leftJoinAndSelect('lastMessageSent.author', 'author')
             .leftJoinAndSelect('lastMessageSent.attachments', 'attachments')
+            .leftJoinAndSelect('lastMessageSent.messageStatuses', 'status')
+            .leftJoinAndSelect('status.user', 'seenBy')
             .orderBy('lastMessageSent.createdAt', 'DESC')
             .leftJoinAndSelect('group.owner', 'owner')
             .leftJoinAndSelect('group.creator', 'creator')
@@ -70,6 +73,8 @@ export class GroupsService implements IGroupService {
                 'creator',
                 'users',
                 'lastMessageSent',
+                'lastMessageSent.messageStatuses',
+                'lastMessageSent.messageStatuses.user',
                 'owner',
                 'creator.profile',
                 'owner.profile',
@@ -82,6 +87,7 @@ export class GroupsService implements IGroupService {
         const checkUser = group.users.find((user) => user.id === userId);
         if (checkUser) return group;
     }
+
     saveGroup(group: Group) {
         return this.groupRepository.save(group);
     }
@@ -96,6 +102,8 @@ export class GroupsService implements IGroupService {
                 'creator',
                 'users',
                 'lastMessageSent',
+                'lastMessageSent.messageStatuses',
+                'lastMessageSent.messageStatuses.user',
                 'owner',
                 'creator.profile',
                 'owner.profile',
@@ -120,7 +128,14 @@ export class GroupsService implements IGroupService {
     async updateOwner() {
         this.groupRepository
             .find({
-                relations: ['creator', 'users', 'lastMessageSent', 'owner'],
+                relations: [
+                    'creator',
+                    'users',
+                    'lastMessageSent',
+                    'lastMessageSent.messageStatuses',
+                    'lastMessageSent.messageStatuses.user',
+                    'owner',
+                ],
             })
             .then((groups) => {
                 groups.forEach((group) => {
@@ -136,7 +151,14 @@ export class GroupsService implements IGroupService {
             where: {
                 id: groupId,
             },
-            relations: ['creator', 'users', 'lastMessageSent', 'owner'],
+            relations: [
+                'creator',
+                'users',
+                'lastMessageSent',
+                'lastMessageSent.messageStatuses',
+                'lastMessageSent.messageStatuses.user',
+                'owner',
+            ],
         });
         if (!group) throw new GroupNotFoundException();
         const checkUser = group.owner.id === userId;
@@ -159,13 +181,11 @@ export class GroupsService implements IGroupService {
         const group = await this.getGroupById({ id: groupId, userId });
         if (!group) throw new GroupNotFoundException();
         const key = generateUUIDV4();
-        const avatarUrl = await this.imageUploadService.uploadFile({
+        group.avatar = await this.imageUploadService.uploadFile({
             key,
             file: avatar,
         });
-        group.avatar = avatarUrl;
-        const savedGroup = await this.groupRepository.save(group);
-        return savedGroup;
+        return await this.groupRepository.save(group);
     }
 
     async changeGroupEmojiIcon(params: ChangeGroupEmojiIconParams): Promise<Group> {
@@ -189,7 +209,7 @@ export class GroupsService implements IGroupService {
         if (nicknameEntity) {
             nicknameEntity.nickname = nickname;
             group.nicknames = group.nicknames.filter((nickname) => nickname.user.id !== user.id);
-            this.groupNicknameRepository.save(nicknameEntity);
+            await this.groupNicknameRepository.save(nicknameEntity);
             group.nicknames.push(nicknameEntity);
         } else {
             const newNickname = this.groupNicknameRepository.create({
@@ -197,7 +217,7 @@ export class GroupsService implements IGroupService {
                 user,
                 nickname,
             });
-            this.groupNicknameRepository.save(newNickname);
+            await this.groupNicknameRepository.save(newNickname);
             group.nicknames.push(newNickname);
         }
         return this.groupRepository.save(group);

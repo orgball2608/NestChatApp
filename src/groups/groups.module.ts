@@ -3,7 +3,7 @@ import { GroupsController } from './controllers/groups.controller';
 import { GroupsService } from './services/groups.service';
 import { Services } from '../utils/constants';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Conversation, Group, GroupMessage, GroupNickname, Message, User } from '../utils/typeorm';
+import { Conversation, Group, GroupMessage, GroupMessageStatus, GroupNickname, Message, User } from '../utils/typeorm';
 import { UsersModule } from '../users/users.module';
 import { GroupMessagesService } from './services/group-messages.service';
 import { GroupMessagesController } from './controllers/group-messages.controller';
@@ -17,17 +17,25 @@ import { MessagesModule } from 'src/messages/messages.module';
 import { ConversationsModule } from 'src/conversations/conversations.module';
 import { GroupAttachmentService } from './services/group-attachments.service';
 import { GroupAttachmentsController } from './controllers/group-attachments.controller';
+import { GroupMessageStatusesService } from './services/group-message-statuses.service';
+import { GroupMessageStatusesController } from './controllers/group-message-statuses.controller';
 
 @Module({
     imports: [
         UsersModule,
-        TypeOrmModule.forFeature([Group, GroupMessage, User, GroupNickname, Message, Conversation]),
+        TypeOrmModule.forFeature([Group, GroupMessage, User, GroupNickname, Message, Conversation, GroupMessageStatus]),
         StorageModule,
         AttachmentsModule,
         MessagesModule,
         ConversationsModule,
     ],
-    controllers: [GroupsController, GroupMessagesController, GroupRecipientsController, GroupAttachmentsController],
+    controllers: [
+        GroupsController,
+        GroupMessagesController,
+        GroupRecipientsController,
+        GroupAttachmentsController,
+        GroupMessageStatusesController,
+    ],
     providers: [
         {
             provide: Services.GROUPS,
@@ -44,6 +52,10 @@ import { GroupAttachmentsController } from './controllers/group-attachments.cont
         {
             provide: Services.GROUP_ATTACHMENTS,
             useClass: GroupAttachmentService,
+        },
+        {
+            provide: Services.GROUP_MESSAGE_STATUS,
+            useClass: GroupMessageStatusesService,
         },
     ],
     exports: [

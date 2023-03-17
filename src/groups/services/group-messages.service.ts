@@ -32,6 +32,7 @@ export class GroupMessagesService implements IGroupMessageService {
         @InjectRepository(Message)
         private readonly messageRepository: Repository<Message>,
     ) {}
+
     async createGroupMessage(params: CreateGroupMessageParams) {
         const { author, groupId, content, attachments, type } = params;
         const group = await this.groupService.getGroupById({ id: groupId, userId: author.id });
@@ -53,6 +54,7 @@ export class GroupMessagesService implements IGroupMessageService {
         const updatedGroup = await this.groupService.saveGroup(group);
         return { message: savedMessage, group: updatedGroup };
     }
+
     async getGroupMessages(params: getGroupMessagesParams) {
         const { author, id } = params;
         const group = await this.groupService.getGroupById({ id, userId: author.id });
@@ -70,6 +72,8 @@ export class GroupMessagesService implements IGroupMessageService {
                 'reacts.author.profile',
                 'reply',
                 'reply.attachments',
+                'messageStatuses',
+                'messageStatuses.user',
             ],
             order: {
                 createdAt: 'DESC',
@@ -95,6 +99,8 @@ export class GroupMessagesService implements IGroupMessageService {
                 'reacts.author.profile',
                 'reply',
                 'reply.attachments',
+                'messageStatuses',
+                'messageStatuses.user',
             ],
             order: {
                 createdAt: 'DESC',
@@ -212,6 +218,8 @@ export class GroupMessagesService implements IGroupMessageService {
                 'reacts.author.profile',
                 'reply',
                 'reply.attachments',
+                'messageStatuses',
+                'messageStatuses.user',
             ],
         });
     }
@@ -269,7 +277,15 @@ export class GroupMessagesService implements IGroupMessageService {
             where: {
                 id: messageId,
             },
-            relations: ['author', 'author.profile', 'attachments', 'reacts', 'reacts.author'],
+            relations: [
+                'author',
+                'author.profile',
+                'attachments',
+                'reacts',
+                'reacts.author',
+                'messageStatuses',
+                'messageStatuses.user',
+            ],
         });
 
         if (!message) throw new HttpException('Message not found', HttpStatus.BAD_REQUEST);

@@ -136,18 +136,12 @@ export type AddGroupRecipientsResponse = {
     users: User[];
 };
 
-export type AddGroupUserResponse = {
-    user: User;
-    group: Group;
-};
-
 export type EditGroupTitleParams = {
     userId: number;
     groupId: number;
     title: string;
 };
 
-export type ImagePermission = 'public-read' | 'private';
 export type UploadImageParams = {
     key: string;
     file: Express.Multer.File;
@@ -389,4 +383,26 @@ export type ChangeGroupThemeParams = {
 export type GetGroupAttachmentsParams = {
     author: User;
     id: number;
+};
+
+export type UpdateMessageStatus = {
+    author: User;
+    conversationId: number;
+    messageId: number;
+};
+
+export type UpdateGroupMessageStatus = {
+    author: User;
+    groupId: number;
+    messageId: number;
+};
+
+export type UpdateMessageStatusPayload = {
+    conversationId: number;
+    message: Message;
+};
+
+export type UpdateGroupMessageStatusPayload = {
+    groupId: number;
+    message: GroupMessage;
 };

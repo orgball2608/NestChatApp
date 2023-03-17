@@ -4,6 +4,8 @@ import { ConversationNickname } from './ConversationNickname';
 import { Group } from './Group';
 import { Message } from './Message';
 import { Profile } from './Profile';
+import { GroupMessageStatus } from './GroupMessageStatus';
+import { MessageStatus } from './MessageStatus';
 
 @Entity({ name: 'users' })
 export class User {
@@ -36,4 +38,10 @@ export class User {
 
     @OneToMany(() => ConversationNickname, (conversationNickname) => conversationNickname.user)
     nicknames: ConversationNickname[];
+
+    @OneToMany(() => GroupMessageStatus, (groupMessageStatus) => groupMessageStatus.user)
+    groupMessageStatuses?: GroupMessageStatus;
+
+    @OneToMany(() => MessageStatus, (mssageStatus) => mssageStatus.user)
+    messageStatuses?: MessageStatus;
 }

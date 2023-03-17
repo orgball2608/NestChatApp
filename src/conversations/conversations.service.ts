@@ -30,6 +30,8 @@ export class ConversationsService implements IConversationsService {
             .createQueryBuilder('conversation')
             .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
             .leftJoinAndSelect('lastMessageSent.author', 'author')
+            .leftJoinAndSelect('lastMessageSent.messageStatuses', 'status')
+            .leftJoinAndSelect('status.user', 'seenBy')
             .leftJoinAndSelect('conversation.creator', 'creator')
             .leftJoinAndSelect('creator.profile', 'creatorProfile')
             .leftJoinAndSelect('conversation.recipient', 'recipient')
@@ -42,13 +44,15 @@ export class ConversationsService implements IConversationsService {
             .getMany();
     }
 
-    async findConversationById(id: number): Promise<Conversation> {
+    findConversationById(id: number): Promise<Conversation> {
         return this.conversationRepository.findOne({
             where: {
                 id,
             },
             relations: [
                 'lastMessageSent',
+                'lastMessageSent.messageStatuses',
+                'lastMessageSent.messageStatuses.user',
                 'creator',
                 'recipient',
                 'creator.profile',
@@ -113,7 +117,7 @@ export class ConversationsService implements IConversationsService {
         if (nicknameEntity) {
             nicknameEntity.nickname = nickname;
             conversation.nicknames = conversation.nicknames.filter((nickname) => nickname.user.id !== user.id);
-            this.nicknameRepository.save(nicknameEntity);
+            await this.nicknameRepository.save(nicknameEntity);
             conversation.nicknames.push(nicknameEntity);
         } else {
             const newNickname = this.nicknameRepository.create({
@@ -121,7 +125,7 @@ export class ConversationsService implements IConversationsService {
                 user,
                 nickname,
             });
-            this.nicknameRepository.save(newNickname);
+            await this.nicknameRepository.save(newNickname);
             conversation.nicknames.push(newNickname);
         }
         return this.conversationRepository.save(conversation);

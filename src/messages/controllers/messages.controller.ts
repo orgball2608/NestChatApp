@@ -11,20 +11,20 @@ import {
     UploadedFiles,
     UseInterceptors,
 } from '@nestjs/common';
-import { Routes, Services } from '../utils/constants';
-import { IMessageService } from './messages';
-import { AuthUser } from '../utils/decorator';
-import { User } from '../utils/typeorm';
-import { CreateMessageDto } from './dtos/CreateMessage.dto';
+import { Routes, Services } from '../../utils/constants';
+import { IMessageService } from '../interfaces/messages';
+import { AuthUser } from '../../utils/decorator';
+import { User } from '../../utils/typeorm';
+import { CreateMessageDto } from '../dtos/CreateMessage.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EditMessageDto } from './dtos/EditMessage.dto';
+import { EditMessageDto } from '../dtos/EditMessage.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AttachmentFile } from 'src/utils/types';
-import { EmptyMessageException } from './exceptions/EmptyMessage';
-import { CreateGifMessageDto } from './dtos/CreateGifMessage.dto';
-import { CreateStickerMessageDto } from './dtos/CreateStickerMessage.dto';
-import { CreateReplyMessageDto } from './dtos/ReplyMessage.dto';
-import { SearchMessageByContentDto } from './dtos/searchMessageByContent.dto';
+import { EmptyMessageException } from '../exceptions/EmptyMessage';
+import { CreateGifMessageDto } from '../dtos/CreateGifMessage.dto';
+import { CreateStickerMessageDto } from '../dtos/CreateStickerMessage.dto';
+import { CreateReplyMessageDto } from '../dtos/ReplyMessage.dto';
+import { SearchMessageByContentDto } from '../dtos/SearchMessageByContent.dto';
 
 @Controller(Routes.MESSAGES)
 export class MessagesController {

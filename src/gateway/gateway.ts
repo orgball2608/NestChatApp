@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
-    WebSocketGateway,
-    WebSocketServer,
-    SubscribeMessage,
+    ConnectedSocket,
     MessageBody,
     OnGatewayConnection,
-    ConnectedSocket,
     OnGatewayDisconnect,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { ServerEvents, Services } from '../utils/constants';
@@ -24,6 +24,8 @@ import {
     leaveGroupResponse,
     RemoveFriendEventPayload,
     RemoveReactMessagePayload,
+    UpdateGroupMessageStatusPayload,
+    UpdateMessageStatusPayload,
 } from '../utils/types';
 import { Conversation, Group, GroupMessage } from '../utils/typeorm';
 import { IGroupService } from '../groups/interfaces/groups';
@@ -49,11 +51,12 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         private readonly friendsService: IFriendService,
     ) {}
 
-    handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
+    handleConnection(socket: AuthenticatedSocket) {
         this.sessions.setUserSocket(socket.user.id, socket);
         console.log('new coming connect');
         socket.emit('connected');
     }
+
     @WebSocketServer()
     server: Server;
 
@@ -68,7 +71,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
 
     @SubscribeMessage('onTypingStart')
-    async onTypingStart(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+    async onTypingStart(@MessageBody() data: any) {
         const conversation = await this.conversationService.findConversationById(data.conversationId);
         if (!conversation) return;
         const { creator, recipient } = conversation;
@@ -80,7 +83,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
 
     @SubscribeMessage('onTypingStop')
-    async onTypingStop(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
+    async onTypingStop(@MessageBody() data: any) {
         const conversation = await this.conversationService.findConversationById(data.conversationId);
         if (!conversation) return;
         const { creator, recipient } = conversation;
@@ -93,7 +96,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     @SubscribeMessage('createMessage')
     handleCreateMessage(@MessageBody() data: any) {
-        console.log('Create Message');
+        console.log('Create Message', data);
     }
 
     @OnEvent('message.create')
@@ -113,6 +116,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         if (authorSocket) authorSocket.emit('onMessage', payload);
         if (recipientSocket) recipientSocket.emit('onMessage', payload);
     }
+
     @OnEvent('conversation.create')
     handleConversationCreateEvent(payload: Conversation) {
         console.log('Inside conversation.create');
@@ -158,6 +162,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         client.join(`group-${data.groupId}`);
         client.to(`group-${data.groupId}`).emit('userGroupJoin');
     }
+
     @SubscribeMessage('onGroupLeave')
     onGroupLeave(@MessageBody() data: any, @ConnectedSocket() client: AuthenticatedSocket) {
         console.log('onGroupJoin');
@@ -265,8 +270,8 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
 
     @OnEvent('group.user.leave')
-    handleLeaveGroup(payload:leaveGroupResponse) {
-        const { savedGroup,userId } = payload;
+    handleLeaveGroup(payload: leaveGroupResponse) {
+        const { savedGroup, userId } = payload;
         const socket = this.sessions.getUserSocket(userId);
         socket && socket.emit('onLeaveGroup', payload);
         socket && socket.leave(`group-${savedGroup.id}`);
@@ -303,8 +308,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     @OnEvent('group.avatar.update')
     updateGroupAvatar(payload) {
         console.log('inside group.avatar.update');
-        const group = payload;
-        this.server.to(`group-${group.id}`).emit('onGroupUpdateAvatar', payload);
+        this.server.to(`group-${payload.id}`).emit('onGroupUpdateAvatar', payload);
     }
 
     @OnEvent('messages.reaction')
@@ -437,5 +441,41 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         console.log('inside group.theme.change');
         const { id } = payload;
         this.server.to(`group-${id}`).emit('onChangeGroupTheme', payload);
+    }
+
+    @OnEvent('message.status.update')
+    async updateMessageStatus(payload: UpdateMessageStatusPayload) {
+        console.log('message.status.update');
+        const { conversationId, message } = payload;
+        const conversation = await this.conversationService.findConversationById(conversationId);
+        if (!conversation) return;
+        const { creator, recipient } = conversation;
+        const recipientSocket = this.sessions.getUserSocket(recipient.id);
+        const creatorSocket = this.sessions.getUserSocket(creator.id);
+        if (recipientSocket)
+            recipientSocket.emit('onUpdateMessageStatus', {
+                message,
+                conversation,
+            });
+        if (creatorSocket)
+            creatorSocket.emit('onUpdateMessageStatus', {
+                message,
+                conversation,
+            });
+    }
+
+    @OnEvent('group.message.status.update')
+    async updateGroupMessageStatus(payload: UpdateGroupMessageStatusPayload) {
+        console.log('inside group.message.status.update');
+        const { groupId, message } = payload;
+        const {
+            author: { id: authorId },
+        } = message;
+        const group = await this.groupService.getGroupById({ id: groupId, userId: authorId });
+        if (!group) return;
+        this.server.to(`group-${group.id}`).emit('onUpdateGroupMessageStatus', {
+            message,
+            group,
+        });
     }
 }

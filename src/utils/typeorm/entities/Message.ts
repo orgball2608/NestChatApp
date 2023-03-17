@@ -4,6 +4,7 @@ import { Conversation } from './Conversation';
 import { BaseMessage } from './BaseMessage';
 import { Attachment } from './Attachment';
 import { ReactMessage } from './ReactMessage';
+import { MessageStatus } from './MessageStatus';
 
 @Entity({ name: 'messages' })
 export class Message extends BaseMessage {
@@ -21,4 +22,7 @@ export class Message extends BaseMessage {
     @OneToMany(() => ReactMessage, (react) => react.message)
     @JoinColumn()
     reacts: ReactMessage[];
+
+    @OneToMany(() => MessageStatus, (messageStatus) => messageStatus.message)
+    messageStatuses?: MessageStatus[];
 }

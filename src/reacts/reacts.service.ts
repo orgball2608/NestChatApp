@@ -1,7 +1,7 @@
-import { HttpCode, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IGroupMessageService } from 'src/groups/interfaces/group-messages';
-import { IMessageService } from 'src/messages/messages';
+import { IMessageService } from 'src/messages/interfaces/messages';
 import { Services } from 'src/utils/constants';
 import { ReactGroupMessage, ReactMessage } from 'src/utils/typeorm';
 import {
@@ -23,6 +23,7 @@ export class ReactsService implements IReactService {
         @Inject(Services.MESSAGES) private messageService: IMessageService,
         @Inject(Services.GROUP_MESSAGES) private groupMessageService: IGroupMessageService,
     ) {}
+
     async createReactMessage(params: CreateReactMessageParams): Promise<CreateReactMessagePayload> {
         const { user, messageId, type, conversationId } = params;
         const message = await this.messageService.getMessageById(messageId);
@@ -60,6 +61,7 @@ export class ReactsService implements IReactService {
             conversationId,
         };
     }
+
     async findById(id: number): Promise<ReactMessage> {
         return this.reactMessageRepository.findOne(id);
     }
