@@ -3,13 +3,13 @@ import { UserController } from './controllers/user.controller';
 import { UserService } from './services/user.service';
 import { Services } from '../utils/constants';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Profile, User } from '../utils/typeorm';
+import { Peer, Profile, User } from '../utils/typeorm';
 import { UserProfileController } from './controllers/user-profile.controller';
 import { UserProfileService } from './services/user-profile.service';
 import { StorageModule } from 'src/storage/storage.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, Profile]), StorageModule, UsersModule],
+    imports: [TypeOrmModule.forFeature([User, Profile, Peer]), StorageModule, UsersModule],
     providers: [
         {
             provide: Services.USERS,

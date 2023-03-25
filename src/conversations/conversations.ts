@@ -9,10 +9,18 @@ import {
 
 export interface IConversationsService {
     createConversation(user: User, conversationParams: CreateConversationParams): Promise<Conversation>;
+
     getConversations(id: number): Promise<Conversation[]>;
+
     findConversationById(id: number): Promise<Conversation | undefined>;
+
     hasAccess({ id, userId }: AccessParams);
+
     changeEmojiIcon(params: ChangeEmojiIconParams): Promise<Conversation>;
+
     changeNickname(params: ChangeConversationNicknameParams): Promise<Conversation>;
+
     changeConversationTheme(params: ChangeConversationThemeParams): Promise<Conversation>;
+
+    isCreated(userId: number, recipientId: number): Promise<Conversation | undefined>;
 }

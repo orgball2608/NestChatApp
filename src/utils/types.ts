@@ -406,3 +406,12 @@ export type UpdateGroupMessageStatusPayload = {
     groupId: number;
     message: GroupMessage;
 };
+
+export type VoiceCallPayload = {
+    conversationId: number;
+    recipientId: number;
+};
+
+export type CallAcceptedPayload = {
+    caller: User;
+};

@@ -15,6 +15,7 @@ import { ConversationNickname } from './entities/ConversationNickname';
 import { GroupNickname } from './entities/GroupNickname';
 import { MessageStatus } from './entities/MessageStatus';
 import { GroupMessageStatus } from './entities/GroupMessageStatus';
+import { Peer } from './entities/Peer';
 
 const entities = [
     User,
@@ -34,6 +35,7 @@ const entities = [
     GroupNickname,
     MessageStatus,
     GroupMessageStatus,
+    Peer,
 ];
 
 export default entities;
@@ -56,4 +58,5 @@ export {
     GroupNickname,
     MessageStatus,
     GroupMessageStatus,
+    Peer,
 };

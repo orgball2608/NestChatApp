@@ -29,12 +29,15 @@ export class ConversationsService implements IConversationsService {
         return this.conversationRepository
             .createQueryBuilder('conversation')
             .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
+            .leftJoinAndSelect('lastMessageSent.attachments', 'attachments')
             .leftJoinAndSelect('lastMessageSent.author', 'author')
             .leftJoinAndSelect('lastMessageSent.messageStatuses', 'status')
             .leftJoinAndSelect('status.user', 'seenBy')
             .leftJoinAndSelect('conversation.creator', 'creator')
+            .leftJoinAndSelect('creator.peer', 'creatorPeer')
             .leftJoinAndSelect('creator.profile', 'creatorProfile')
             .leftJoinAndSelect('conversation.recipient', 'recipient')
+            .leftJoinAndSelect('recipient.peer', 'recipientPeer')
             .leftJoinAndSelect('recipient.profile', 'recipientProfile')
             .leftJoinAndSelect('conversation.nicknames', 'nicknames')
             .leftJoinAndSelect('nicknames.user', 'userNickname')
@@ -51,6 +54,7 @@ export class ConversationsService implements IConversationsService {
             },
             relations: [
                 'lastMessageSent',
+                'lastMessageSent.attachments',
                 'lastMessageSent.messageStatuses',
                 'lastMessageSent.messageStatuses.user',
                 'creator',
@@ -137,5 +141,20 @@ export class ConversationsService implements IConversationsService {
         if (!conversation) throw new ConversationNotFoundException();
         conversation.theme = theme;
         return this.conversationRepository.save(conversation);
+    }
+
+    async isCreated(userId: number, recipientId: number) {
+        return this.conversationRepository.findOne({
+            where: [
+                {
+                    creator: { id: userId },
+                    recipient: { id: recipientId },
+                },
+                {
+                    creator: { id: recipientId },
+                    recipient: { id: userId },
+                },
+            ],
+        });
     }
 }

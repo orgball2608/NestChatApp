@@ -6,6 +6,7 @@ import { Message } from './Message';
 import { Profile } from './Profile';
 import { GroupMessageStatus } from './GroupMessageStatus';
 import { MessageStatus } from './MessageStatus';
+import { Peer } from './Peer';
 
 @Entity({ name: 'users' })
 export class User {
@@ -44,4 +45,10 @@ export class User {
 
     @OneToMany(() => MessageStatus, (mssageStatus) => mssageStatus.user)
     messageStatuses?: MessageStatus;
+
+    @OneToOne(() => Peer, (peer) => peer.user, {
+        cascade: ['insert', 'remove', 'update'],
+    })
+    @JoinColumn()
+    peer: Peer;
 }
