@@ -7,4 +7,5 @@ export interface IUserService {
     saveUser(user: User): Promise<User>;
     searchUsers(query: string): Promise<User[]>;
     getUserById(id: string): Promise<User>;
+    getUserByPeerId(peerId: string): Promise<User>;
 }

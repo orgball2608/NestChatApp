@@ -55,4 +55,8 @@ export class UserService implements IUserService {
     getUserById(id: string): Promise<User> {
         return this.userRepository.findOne(id);
     }
+
+    getUserByPeerId(peerId: string): Promise<User> {
+        return this.userRepository.findOne({ where: { peer: { id: peerId } } });
+    }
 }

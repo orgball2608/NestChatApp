@@ -79,6 +79,7 @@ export class GroupsService implements IGroupService {
                 'creator.profile',
                 'owner.profile',
                 'users.profile',
+                'users.peer',
                 'nicknames',
                 'nicknames.user',
             ],
