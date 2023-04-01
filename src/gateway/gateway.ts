@@ -593,7 +593,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         @MessageBody() data: CreateGroupCallDtoDto,
         @ConnectedSocket() socket: AuthenticatedSocket,
     ) {
-        console.log('onGroupVideoCallCreated');
+        console.log('onGroupVideoCallInitiate');
         const { groupId } = data;
         const caller = socket.user;
         const group = await this.groupService.getGroupById({ id: groupId, userId: caller.id });
@@ -608,8 +608,28 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         });
     }
 
-    @SubscribeMessage('groupVideoCallAccepted')
-    async handleGroupVideoCallAccepted(@MessageBody() data, @ConnectedSocket() socket: AuthenticatedSocket) {
+    @SubscribeMessage('onGroupVoiceCallInitiate')
+    async handleGroupVoiceCall(
+        @MessageBody() data: CreateGroupCallDtoDto,
+        @ConnectedSocket() socket: AuthenticatedSocket,
+    ) {
+        console.log('onGroupVoiceCallInitiate');
+        const { groupId } = data;
+        const caller = socket.user;
+        const group = await this.groupService.getGroupById({ id: groupId, userId: caller.id });
+        const onlineUsers = [];
+        group.users.forEach((user) => {
+            const socket = this.sessions.getUserSocket(user.id);
+            socket && onlineUsers.push(user);
+        });
+        onlineUsers.forEach((user) => {
+            const socket = this.sessions.getUserSocket(user.id);
+            socket && socket.emit('onGroupVoiceCall', { caller, groupId, participants: onlineUsers });
+        });
+    }
+
+    @SubscribeMessage('groupCallAccepted')
+    async handleGroupCallAccepted(@MessageBody() data, @ConnectedSocket() socket: AuthenticatedSocket) {
         const callerSocket = this.sessions.getUserSocket(data.caller.id);
         const group = await this.groupService.getGroupById({ id: data.groupId, userId: data.caller.id });
         if (!group) return console.log('No group found');
@@ -621,13 +641,13 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         if (callerSocket) {
             console.log('Emitting onGroupVideoCallAccept event');
             const payload = { ...data, participants: onlineUsers, acceptor: socket.user };
-            callerSocket.emit('onGroupVideoCallAccept', payload);
-            socket.emit('onGroupVideoCallAccept', payload);
+            callerSocket.emit('onGroupCallAccept', payload);
+            socket.emit('onGroupCallAccept', payload);
         }
     }
 
-    @SubscribeMessage('groupVideoCallRejected')
-    async handleGroupVideoCallRejected(
+    @SubscribeMessage('groupCallRejected')
+    async handleGroupCallRejected(
         @MessageBody() data: GroupVideoCallRejectedDtoDto,
         @ConnectedSocket() socket: AuthenticatedSocket,
     ) {
@@ -642,30 +662,30 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
             socket && onlineUsers.push(user);
         });
         if (onlineUsers.length > 2) {
-            callerSocket && callerSocket.emit('onGroupVideoCallReject', { receiver, isEndCall: false });
-            socket.emit('onGroupVideoCallReject', { receiver, isEndCall: false });
+            callerSocket && callerSocket.emit('onGroupCallReject', { receiver, isEndCall: false });
+            socket.emit('onGroupCallReject', { receiver, isEndCall: false });
         } else {
-            callerSocket && callerSocket.emit('onGroupVideoCallReject', { finisher: socket.user, isEndCall: true });
-            socket.emit('onGroupVideoCallReject', { finisher: socket.user, isEndCall: true });
+            callerSocket && callerSocket.emit('onGroupCallReject', { finisher: socket.user, isEndCall: true });
+            socket.emit('onGroupCallReject', { finisher: socket.user, isEndCall: true });
         }
     }
 
-    @SubscribeMessage('groupVideoCallHangUp')
-    async handleGroupVideoCallHangUp(
+    @SubscribeMessage('groupCallHangUp')
+    async handleGroupCallHangUp(
         @MessageBody() { participants, streamId }: GroupVideoCallHangUpDto,
         @ConnectedSocket() socket: AuthenticatedSocket,
     ) {
         if (participants.length >= 2) {
             participants.forEach((user) => {
                 const member = this.sessions.getUserSocket(user.id);
-                member && member.emit('onGroupVideoCallMemberLeft', { finisher: socket.user, streamId });
+                member && member.emit('onGroupCallMemberLeft', { finisher: socket.user, streamId });
             });
         } else {
             if (participants.length === 1) {
                 const member = this.sessions.getUserSocket(participants[0].id);
-                member && member.emit('onGroupVideoCallHangUp');
+                member && member.emit('onGroupCallHangUp');
             }
         }
-        socket.emit('onGroupVideoCallHangUp');
+        socket.emit('onGroupCallHangUp');
     }
 }
