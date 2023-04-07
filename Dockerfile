@@ -1,5 +1,5 @@
 #build stage
-FROM node:18-apline AS build
+FROM node:18-alpine AS build
 
 WORKDIR /usr/src/app
 
@@ -7,12 +7,14 @@ COPY package*.json ./
 
 RUN npm install
 
+RUN npm i typeorm@0.2.37 
+
 COPY . .
 
 RUN npm run build
 
 #production stage
-FROM node:18-apline 
+FROM node:18-alpine 
 
 WORKDIR /usr/src/app
 
