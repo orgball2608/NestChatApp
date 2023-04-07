@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  web:
+    build: ./
+    container_name: nestjs_api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - PORT: 3000
+      - MYSQL_DB_HOS: localhost
+      - MYSQL_DB_USERNAME: root
+      - MYSQL_DB_PASSWORD: 080902
+      - MYSQL_DB_PORT: 3306
+      - MYSQL_DB_DATABASE: nest_chat_aap
+      - SESSION_SECRET: qyueushahdgdg
+      - COOKIE_SECRET: quang
+      - AWS_ACCESS_KEY_ID: AKIA2JYNVTTSZZ6LUWFK
+      - AWS_SECRET_ACCESS_KEY: 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
+      - AWS_PUBLIC_BUCKET_KEY: nest-chat-app
+      - AWS_REGION: ap-southeast-1
+    networks:
+      - nestjs_network
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=08092002
+      - MYSQL_DATABASE=nest_chat_aap
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=080902
+networks:
+  nestjs_network:
+    driver: bridge

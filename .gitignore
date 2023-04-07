@@ -3,6 +3,7 @@
 /node_modules
 .idea/
 .vs/
+docker-compose.yml
 .env
 .pk
 .pem
