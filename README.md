@@ -121,70 +121,70 @@ or
 
 .
 ├── src
-│ ├── attachments                        // attachments service
-│ │ ├── attachments.controller.ts        // attachments controller
-│ │ ├── attachments.module.ts 		     // attachments module
-│ │ ├── attachments.service.ts           // attachments service
-│ │ ├── attachments.ts				     // attachments interface
-│ ├── auth                               // auth service
-│ │ ├── auth.controller.ts               // auth controller
-│ │ ├── auth.module.ts 		             // auth module
-│ │ ├── auth.service.ts                  // auth service
-│ │ ├── auth.ts				             // auth interface
-│ │ ├── dtos				             // auth dtos
+│ ├── attachments                          // attachments service
+│ │ ├── attachments.controller.ts          // attachments controller
+│ │ ├── attachments.module.ts 		         // attachments module
+│ │ ├── attachments.service.ts             // attachments service
+│ │ ├── attachments.ts				             // attachments interface
+│ ├── auth                                 // auth service
+│ │ ├── auth.controller.ts                 // auth controller
+│ │ ├── auth.module.ts 		                 // auth module
+│ │ ├── auth.service.ts                    // auth service
+│ │ ├── auth.ts				                     // auth interface
+│ │ ├── dtos				                       // auth dtos
 │ │ │ ├── CreateUser.dto.ts				 
-│ │ ├── utils				             // auth utils
-│ │ │ ├── Guards.ts				 		 // custom guards
+│ │ ├── utils				                       // auth utils
+│ │ │ ├── Guards.ts				 		             // custom guards
 │ │ │ ├── LocalStrategy.ts				
 │ │ │ ├── SessionSerializer.ts			
-│ ├── conversations                      // conversations service
-│ │ ├── conversations.controller.ts      // conversations controller
-│ │ ├── conversations.module.ts 		 // conversations module
-│ │ ├── conversations.service.ts         // conversations service
-│ │ ├── conversations.ts				 // conversations interface
-│ │ ├── dtos				             // conversations dtos
+│ ├── conversations                        // conversations service
+│ │ ├── conversations.controller.ts        // conversations controller
+│ │ ├── conversations.module.ts 		       // conversations module
+│ │ ├── conversations.service.ts           // conversations service
+│ │ ├── conversations.ts				           // conversations interface
+│ │ ├── dtos				                       // conversations dtos
 │ │ │ ├── ChangeEmojiIcon.dto.ts
 │ │ │ ├── ChangeNickname.dto.ts
 │ │ │ ├── ChangeTheme.dto.ts
 │ │ │ ├── CreateCoversation.dto.ts					 
-│ │ ├── exceptions				         // conversations exceptions
+│ │ ├── exceptions				                 // conversations exceptions
 │ │ │ ├── ConversationNotFound.ts	
 │ │ │ ├── InvalidConversation.ts	
 │ │ │ ├── NotConversationOwner.ts
-│ ├── friend-requests                    // friend-requests service
-│ │ ├── friend-requests.controller.ts    // friend-requests controller
-│ │ ├── friend-requests.module.ts 		 //friend-requests module
-│ │ ├── friend-requests.service.ts       // friend-requests service
-│ │ ├── friend-requests.ts				 // friend-requests interface
-│ │ ├── friend-requests.event.ts		 // friend-requests event
-│ │ ├── dtos				             // friend-requests dtos
+│ ├── friend-requests                      // friend-requests service
+│ │ ├── friend-requests.controller.ts      // friend-requests controller
+│ │ ├── friend-requests.module.ts 		     //friend-requests module
+│ │ ├── friend-requests.service.ts         // friend-requests service
+│ │ ├── friend-requests.ts				         // friend-requests interface
+│ │ ├── friend-requests.event.ts		       // friend-requests event
+│ │ ├── dtos				                       // friend-requests dtos
 │ │ │ ├── CreateFriendRequest.dto.ts			 
-│ │ ├── exceptions				         // friend-requests exceptions
+│ │ ├── exceptions				                 // friend-requests exceptions
 │ │ │ ├── FriendRequest.ts	
 │ │ │ ├── FriendRequestAccepted.ts	
 │ │ │ ├── FriendRequestNotFound.ts
 │ │ │ ├── FriendRequestPending.ts	
 │ │ │ ├── FriendRequestNotFound.ts
-│ ├── friends                             // friend service
-│ │ ├── friend.controller.ts              // friend controller
-│ │ ├── friend.module.ts 		          //friend module
-│ │ ├── friend.service.ts                 // friend service
-│ │ ├── friend.ts				          // friend interface		 
-│ │ ├── exceptions				          // friend exceptions
+│ ├── friends                              // friend service
+│ │ ├── friend.controller.ts               // friend controller
+│ │ ├── friend.module.ts 		               //friend module
+│ │ ├── friend.service.ts                  // friend service
+│ │ ├── friend.ts				                   // friend interface		 
+│ │ ├── exceptions				                 // friend exceptions
 │ │ │ ├── FriendNotFound.ts	
-│ ├── gateway                             // gateway service
-│ │ ├── gateway.adapter.ts                // authenticate WebSocket connections
-│ │ ├── gateway.module.ts 		          // gateway module
-│ │ ├── gateway.session.ts                // gateway service
-│ │ ├── gateway.ts				          // on event and emit event :))
-│ │ ├── dtos				              // gateway dtos
+│ ├── gateway                              // gateway service
+│ │ ├── gateway.adapter.ts                 // authenticate WebSocket connections
+│ │ ├── gateway.module.ts 		             // gateway module
+│ │ ├── gateway.session.ts                 // gateway service
+│ │ ├── gateway.ts				                 // on event and emit event :))
+│ │ ├── dtos				                       // gateway dtos
 │ │ │ ├── CreateCall.dto.ts
 │ │ │ ├── CreateGroupCall.dto.ts
 │ │ │ ├── GroupVideoCallRejected.dto.ts
 │ │ │ ├── GroupVideoCallHangUp.dto.ts	
 │ │ │ ├── VideoCallHangUp.dto.ts
-│ ├── groups                              // groups service
-│ │ ├── controllers                       // groups controller
+│ ├── groups                               // groups service
+│ │ ├── controllers                        // groups controller
 │ │ │ ├── group-attachments.controller.ts
 │ │ │ ├── group-message-statuses.controller.ts
 │ │ │ ├── group-messages.controller.ts
@@ -204,7 +204,7 @@ or
 │ │ │ ├── group.ts
 │ │ ├── middlewares                        // groups middlewares
 │ │ │ ├── group.middleware.ts
-│ │ ├── dtos				               // groups dtos
+│ │ ├── dtos				                       // groups dtos
 │ │ │ ├── AddGroupRecipient.dto.ts
 │ │ │ ├── AddGroupRecipient.dto.ts	
 │ │ │ ├── ChangeGroupEmojiDto.dto.ts	
@@ -216,7 +216,7 @@ or
 │ │ │ ├── EditGroupMessage.dto.ts	
 │ │ │ ├── EditGroupTitle.dto.ts	
 │ │ │ ├── TransferOwner.dto.ts	
-│ │ ├── exceptions				            // groups exceptions
+│ │ ├── exceptions				                 // groups exceptions
 │ │ │ ├── GroupNotFound.ts	
 │ │ │ ├── GroupOwnerTransfer.ts	
 │ │ │ ├── NotGroupOwner.ts
@@ -231,14 +231,14 @@ or
 │ │ ├── interfaces                         // messages interfaces
 │ │ │ ├── message-statuses.ts
 │ │ │ ├── messages.ts
-│ │ ├── dtos				               // messages dtos
+│ │ ├── dtos				                       // messages dtos
 │ │ │ ├── CreateGifMessage.dto.ts
 │ │ │ ├── CreateMessage.dto.ts
 │ │ │ ├── CreateStickerMessage.dto.ts	
 │ │ │ ├── EditMessage.dto.ts
 │ │ │ ├── RepyMessage.dto.ts		
 │ │ │ ├── SearchMessageByContent.dto.ts
-│ │ ├── exceptions				           // messages exceptions
+│ │ ├── exceptions				                 // messages exceptions
 │ │ │ ├── EmptyMessage.ts		
 │ ├── reacts                               // reacts service
 │ │ ├── controllers                        // reacts controller
@@ -247,7 +247,7 @@ or
 │ │ ├── reacts.service.ts                  // messages service
 │ │ ├── reacts.module.ts                   // messages module
 │ │ ├── reacts.ts                          // messages interface
-│ │ ├── dtos				               // messages dtos
+│ │ ├── dtos				                       // messages dtos
 │ │ │ ├── CreateReact.dto.ts
 │ ├── storage                              // storage service
 │ │ ├── services                           // storage services
@@ -266,10 +266,10 @@ or
 │ │ ├── interfaces                         //users interfaces
 │ │ │ ├── user-profile.ts
 │ │ │ ├── reacts.ts
-│ │ ├── dtos				               // users dtos
+│ │ ├── dtos				                       // users dtos
 │ │ │ ├── UpdateBio.dto.ts
 │ │ │ ├── UpdateLocation.dto.ts
-│ │ ├── exceptions				           // users exceptions
+│ │ ├── exceptions				                 // users exceptions
 │ │ │ ├── UserNotFound.ts	
 │ ├── utils                                // utils
 │ │ ├── typeorm
