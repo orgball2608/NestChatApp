@@ -17,10 +17,10 @@ services:
       - MYSQL_DB_DATABASE=nest_chat_aap
       - SESSION_SECRET=qyueushahdgdg
       - COOKIE_SECRET=quang
-      - AWS_ACCESS_KEY_ID=AKIA2JYNVTTSZZ6LUWFK
-      - AWS_SECRET_ACCESS_KEY=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
-      - AWS_PUBLIC_BUCKET_KEY=nest-chat-app
-      - AWS_REGION=ap-southeast-1
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      - AWS_PUBLIC_BUCKET_KEY=
+      - AWS_REGION=
     networks:
       - nestjs_network
   db:
