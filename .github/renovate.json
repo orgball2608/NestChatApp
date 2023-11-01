@@ -6,6 +6,8 @@
     "semanticCommits": "enabled",
     "semanticPrefix": "chore(dependency)",
     "labels": ["dependencies"],
+    "reviewers": ["orgball2608"],
+    "assignees": ["orgball2608"],
     "lockFileMaintenance": {
         "enabled": true
     },
