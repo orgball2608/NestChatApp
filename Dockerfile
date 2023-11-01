@@ -1,9 +1,12 @@
-#build stage
-FROM node:18-alpine AS build
+# Stage 1: Development
+FROM node:18-alpine3.18 AS development
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
+COPY .env.docker .env
+
+RUN npm install typeorm@0.3.0
 
 RUN npm install
 
@@ -13,24 +16,14 @@ COPY . .
 
 RUN npm run build
 
-#production stage
-FROM node:18-alpine 
+# Stage 2: Production
+FROM node:18-alpine3.18 AS production
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+COPY --from=development /app/node_modules ./node_modules
+COPY --from=development /app/package*.json ./
+COPY --from=development /app/dist ./dist
 
-COPY --from=build /usr/src/app/dist ./dist
-
-COPY package*.json ./
-
-RUN npm install --only=production
-
-RUN rm package*.json
-
-EXPOSE 3000
-
-CMD [ "node", "dist/main.js" ]
-
+CMD [ "npm run", "build:docker" ]
 
