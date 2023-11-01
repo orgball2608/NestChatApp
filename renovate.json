@@ -1,0 +1,18 @@
+{
+    "extends": ["config:base"],
+    "rebaseWhen": "conflicted",
+    "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+    "semanticCommits": "enabled",
+    "semanticPrefix": "chore(dependency)",
+    "labels": ["dependencies"],
+    "lockFileMaintenance": {
+      "enabled": true
+    },
+    "baseBranches": ["main"],
+    "separateMajorMinor": false,
+    "rangeStrategy": "pin",
+    "prHourlyLimit": 100,
+    "packageFiles": [
+      "package.json"
+    ]
+  }
