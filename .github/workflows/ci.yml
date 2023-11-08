@@ -22,17 +22,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install Yarn
-        run: npm install -g yarn
+      - name: Install type orm v3
+        run: npm install typeorm@0.3.0
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
 
-      # - name: Lint code
-      #   run: yarn lint
+      - name: Install type orm v2
+        run: npm install typeorm@0.2.37
 
       - name: Build code
-        run: yarn build
-
-      # - name: Run tests
-      #   run: yarn test
+        run: npm run build
