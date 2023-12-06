@@ -1,0 +1,1 @@
+CREATE DATABASE IF NOT EXISTS nest_chat_app;

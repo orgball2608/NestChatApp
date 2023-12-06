@@ -1,39 +1,39 @@
 version: '3.8'
 
 services:
-  web:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-      target: development
-    container_name: nestjs_api
-    command: npm run start:dev
-    env_file:
-      - .env.docker
-    ports:
-      - "3001:3001"
-    depends_on:
-      - db
-    networks:
-      - nestjs_network
-    volumes:
-      - .:/usr/src/app
+    web:
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+            target: development
+        container_name: nestjs_api
+        command: npm run start:dev
+        env_file:
+            - .env.docker
+        ports:
+            - '3001:3001'
+        depends_on:
+            - db
+        networks:
+            - nestjs_network
+        volumes:
+            - .:/usr/src/app
 
-  db:
-    image: mysql:8.0.32
-    restart: always
-    command: --default-authentication-plugin=mysql_native_password
-    cap_add: [SYS_NICE]
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - mysql:/var/lib/mysql
-      - ./migrates:/docker-entrypoint-initdb.d/
-    ports:
-      - '3306:3306'
+    db:
+        image: mysql:8.0.32
+        restart: always
+        command: --default-authentication-plugin=mysql_native_password
+        cap_add: [SYS_NICE]
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - db_data:/var/lib/mysql
+            - .docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+        ports:
+            - '3306:3306'
 
 networks:
-  nestjs_network:
-    driver: bridge
+    nestjs_network:
+        driver: bridge
 volumes:
-  mysql:
+    db_data:

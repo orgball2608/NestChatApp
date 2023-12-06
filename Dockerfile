@@ -25,5 +25,5 @@ COPY --from=development /app/node_modules ./node_modules
 COPY --from=development /app/package*.json ./
 COPY --from=development /app/dist ./dist
 
-CMD [ "npm run", "build:docker" ]
+CMD [ "node", "dist/main.js" ]
 

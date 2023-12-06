@@ -1,35 +1,35 @@
 name: ci
 on:
-  pull_request:
-    branches: ['*']
+    pull_request:
+        branches: ['main']
 
-  push:
-    branches: ["main"]
+    push:
+        branches: ['main']
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18.x]
 
-    steps:
-      - name: Copy repository
-        uses: actions/checkout@v3
+        steps:
+            - name: Copy repository
+              uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
 
-      - name: Install type orm v3
-        run: npm install typeorm@0.3.0
+            - name: Install type orm v3
+              run: npm install typeorm@0.3.0
 
-      - name: Install dependencies
-        run: npm install
+            - name: Install dependencies
+              run: npm install
 
-      - name: Install type orm v2
-        run: npm install typeorm@0.2.37
+            - name: Install type orm v2
+              run: npm install typeorm@0.2.37
 
-      - name: Build code
-        run: npm run build
+            - name: Build code
+              run: npm run build
