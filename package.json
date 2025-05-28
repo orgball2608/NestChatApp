@@ -41,7 +41,7 @@
     "cookie": "0.7.0",
     "cookie-parser": "^1.4.6",
     "express-session": "^1.17.3",
-    "mysql2": "3.9.8",
+    "mysql2": "3.14.1",
     "node": "^18.13.0",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
