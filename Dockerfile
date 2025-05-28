@@ -6,11 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY .env.docker .env
 
-RUN npm install typeorm@0.3.0
-
 RUN npm install
-
-RUN npm i typeorm@0.2.37 
 
 COPY . .
 

@@ -35,17 +35,9 @@ NestChatApp is a real-time chat application built using NestJS, TypeORM, MySQL, 
     ```
 
 2. **Install the dependencies**:
-    - First, install TypeORM version 0.3.0 to resolve the conflict:
-        ```bash
-        npm install typeorm@0.3.0
-        ```
     - Then, install all the other dependencies:
         ```bash
         npm install
-        ```
-    - Finally, revert TypeORM to version 0.2.37:
-        ```bash
-        npm install typeorm@0.2.37
         ```
 
 3. **Create a `.env.development` file** in the root directory and paste the following:
