@@ -86,6 +86,6 @@ export class GroupRecipientsService implements IGroupRecipientService {
         if (group.owner.id === userId) throw new HttpException('Cannot leave group as owner', HttpStatus.BAD_REQUEST);
         group.users = group.users.filter((user) => user.id !== userId);
         const savedGroup = await this.groupService.saveGroup(group);
-        return { savedGroup,userId};
+        return { savedGroup, userId };
     }
 }

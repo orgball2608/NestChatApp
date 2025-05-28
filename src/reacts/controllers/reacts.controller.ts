@@ -43,6 +43,4 @@ export class ReactsController {
         this.eventEmitter.emit('messages.reaction.remove', response);
         return response;
     }
-
-    
 }

@@ -7,15 +7,15 @@ import { LocalStrategy } from './utils/LocalStrategy';
 import { SessionSerializer } from './utils/SessionSerializer';
 
 @Module({
-  imports: [UsersModule],
-  controllers: [AuthController],
-  providers: [
-    LocalStrategy,
-    SessionSerializer,
-    {
-      provide: Services.AUTH,
-      useClass: AuthService,
-    },
-  ],
+    imports: [UsersModule],
+    controllers: [AuthController],
+    providers: [
+        LocalStrategy,
+        SessionSerializer,
+        {
+            provide: Services.AUTH,
+            useClass: AuthService,
+        },
+    ],
 })
 export class AuthModule {}

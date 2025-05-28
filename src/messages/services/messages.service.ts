@@ -81,8 +81,8 @@ export class MessagesService implements IMessageService {
         });
     }
 
-    getMessagesLengthByConversationId(conversationId: number): Promise<number> {
-        return this.messageRepository.count({ conversation: { id: conversationId } });
+    async getMessagesLengthByConversationId(conversationId: number): Promise<number> {
+        return this.messageRepository.count({ where: { conversation: { id: conversationId } } });
     }
 
     async getMessagesWithLimit(params: getConversationMessagesParams): Promise<Message[]> {
@@ -129,10 +129,12 @@ export class MessagesService implements IMessageService {
         if (!conversation) throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
 
         const message = await this.messageRepository.findOne({
-            id: params.messageId,
-            author: { id: params.userId },
-            conversation: {
-                id: params.conversationId,
+            where: {
+                id: params.messageId,
+                author: { id: params.userId },
+                conversation: {
+                    id: params.conversationId,
+                },
             },
         });
 
