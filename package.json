@@ -62,7 +62,7 @@
     "@types/jest": "29.5.14",
     "@types/multer": "1.4.7",
     "@types/node": "16.18.3",
-    "@types/passport-local": "1.0.34",
+    "@types/passport-local": "1.0.38",
     "@types/supertest": "6.0.3",
     "@typescript-eslint/eslint-plugin": "8.33.0",
     "@typescript-eslint/parser": "8.33.0",
