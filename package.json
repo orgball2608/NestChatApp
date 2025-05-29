@@ -45,7 +45,7 @@
     "node": "18.13.0",
     "passport": "0.6.0",
     "passport-local": "1.0.0",
-    "reflect-metadata": "0.1.14",
+    "reflect-metadata": "0.2.2",
     "rimraf": "6.0.1",
     "rxjs": "7.5.7",
     "sharp": "0.34.2",
