@@ -29,7 +29,7 @@
     "@nestjs/passport": "9.0.0",
     "@nestjs/platform-express": "9.2.1",
     "@nestjs/platform-socket.io": "9.2.1",
-    "@nestjs/typeorm": "9.0.1",
+    "@nestjs/typeorm": "11.0.0",
     "@nestjs/websockets": "9.2.1",
     "@types/cookie": "1.0.0",
     "@types/cookie-parser": "1.4.3",
