@@ -34,7 +34,7 @@
     "@types/cookie": "1.0.0",
     "@types/cookie-parser": "1.4.3",
     "aws-sdk": "2.1305.0",
-    "bcrypt": "5.1.0",
+    "bcrypt": "6.0.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
     "connect-typeorm": "2.0.0",
